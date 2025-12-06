@@ -25,7 +25,7 @@ int parse_command_event(const char* json_str, command_event* event) {
         case 'A': event->cmd = ARM; break;
         case 'D': event->cmd = DISARM; break;
         case 'R': event->cmd = RESOLVE; break;
-        default: event->cmd = UNKNOWN_COMMAND; return -1;
+        default: return -1;
     }
 
     // Find end of timestamp value and validate length
