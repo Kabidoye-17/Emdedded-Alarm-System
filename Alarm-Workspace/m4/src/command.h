@@ -1,15 +1,15 @@
 #ifndef COMMAND_H
 #define COMMAND_H
 
-typedef enum command {
+typedef enum command_type {
     ARM,
     DISARM,
     RESOLVE,
     UNKNOWN_COMMAND
-} command;
+} command_type;
 
 typedef struct {
-    command cmd;
+    command_type cmd;
     char timestamp[25];
 } command_event;
 
