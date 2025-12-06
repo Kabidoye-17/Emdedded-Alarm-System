@@ -10,5 +10,13 @@
 # But keep src directory within m4
 !/m4/src/
 
+# Keep configuration files in m4
+!/m4/*.mk
+!/m4/Makefile
+!/m4/FreeRTOSConfig.h
+!/m4/README.md
+!/m4/soc_init.c
+!/m4/soc_init.h
+
 # And keep .gitignore
 !.gitignore
