@@ -1,0 +1,14 @@
+# Ignore everything at root
+/*
+
+# But keep m4 directory
+!/m4/
+
+# Within m4, ignore everything
+/m4/*
+
+# But keep src directory within m4
+!/m4/src/
+
+# And keep .gitignore
+!.gitignore
