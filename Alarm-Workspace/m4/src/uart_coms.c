@@ -1,14 +1,16 @@
 #include "mxc_device.h"
 #include "uart.h"
 #include "nvic_table.h"
+#include <stddef.h>
 
 #include "uart_coms.h"
 
 #define BAUD_RATE 115200
+#define JSON_BUFFER_SIZE 96
 
 typedef struct {
     uart_rxMessage_cbt uart_rxMessage_cb;
-    char json_buffer[96];
+    char json_buffer[JSON_BUFFER_SIZE];
     volatile int json_idx;
 } uart_vars_t;
 static uart_vars_t uart_vars;
@@ -23,7 +25,7 @@ static uart_vars_t uart_vars;
  * Message parsing:
  * - '{' resets buffer index to start new message
  * - '}' null-terminates buffer and invokes callback
- * - Other bytes are stored in buffer (up to 95 chars)
+ * - Other bytes are stored in buffer (up to JSON_BUFFER_SIZE - 1 chars)
  */
 void UART0_Handler(void)
 {
@@ -37,9 +39,11 @@ void UART0_Handler(void)
         }
         else if (byte == '}') {
             uart_vars.json_buffer[uart_vars.json_idx] = '\0';
-            uart_vars.uart_rxMessage_cb(uart_vars.json_buffer);
+            if (uart_vars.uart_rxMessage_cb != NULL) {
+                uart_vars.uart_rxMessage_cb(uart_vars.json_buffer);
+            }
         }
-        else if (uart_vars.json_idx < 95) {
+        else if (uart_vars.json_idx < JSON_BUFFER_SIZE - 1) {
             uart_vars.json_buffer[uart_vars.json_idx++] = byte;
         }
     }
