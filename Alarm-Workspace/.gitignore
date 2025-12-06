@@ -1,3 +1,10 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+
 # Ignore everything at root
 /*
 
