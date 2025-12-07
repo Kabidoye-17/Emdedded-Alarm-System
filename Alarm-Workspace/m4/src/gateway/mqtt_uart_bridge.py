@@ -18,7 +18,7 @@ class MQTTToUARTBridge:
     def start(self):
         """Start the MQTT-UART bridge"""
         try:
-            # Subscribe to test topic
+            # Subscribe to command topic
             self.subscriber.subscribe(topics.command, self.on_command_received)
 
             # Start the MQTT client (blocking)

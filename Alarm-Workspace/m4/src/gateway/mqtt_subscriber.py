@@ -11,13 +11,16 @@ class MQTTSubscriber(MQTTClient):
     def _on_message(self, _client, _userdata, msg):
         """Handle incoming messages"""
         topic = msg.topic
-        payload = msg.payload.decode('utf-8')
+        payload = msg.payload.decode('utf-8', errors='replace')
 
         print(f"Received message on topic '{topic}': {payload}")
 
         # Call registered callback for this topic
         if topic in self.subscriptions:
-            self.subscriptions[topic](payload)
+            try:
+                self.subscriptions[topic](payload)
+            except Exception as e:
+                print(f"Error in callback for topic '{topic}': {e}")
 
     def _subscribe_topic(self, topic):
         """Helper to subscribe to a single topic"""

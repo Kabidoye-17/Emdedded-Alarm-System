@@ -5,7 +5,7 @@ class MQTTClient:
     """Base MQTT client for connection management"""
 
     def __init__(self):
-        self.client = mqtt.Client()
+        self.client = mqtt.Client(mqtt.CallbackAPIVersion.VERSION1)
         self.broker = mqtt_config.broker
         self.port = mqtt_config.port
         self.keep_alive = mqtt_config.keep_alive
