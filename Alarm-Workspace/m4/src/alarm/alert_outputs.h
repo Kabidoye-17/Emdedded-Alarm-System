@@ -1,5 +1,5 @@
-#ifndef ALERT_CONTROL_H
-#define ALERT_CONTROL_H
+#ifndef ALERT_OUTPUTS_H
+#define ALERT_OUTPUTS_H
 
 /*
  * Alert control for the alarm system.
@@ -19,7 +19,7 @@
 
 
 // Initialize alert control system
-void alert_control_init();
+void alert_outputs_init();
 
 // Make the LED show a solid color
 void turn_on_green_LED();
@@ -38,4 +38,4 @@ void red_LED_flash();
 void stop_LED_effects();
 
 
-#endif /* ALERT_CONTROL_H */
+#endif /* ALERT_OUTPUTS_H */

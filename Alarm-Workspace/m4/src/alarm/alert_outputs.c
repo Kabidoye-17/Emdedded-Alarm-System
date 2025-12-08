@@ -1,6 +1,6 @@
-#include "alert_control.h"
+#include "alert_outputs.h"
 
-void alert_control_init() {
+void alert_outputs_init() {
     // Initialization code for alert control system
 }
 
