@@ -1,28 +1,134 @@
+############################################
+# VS CODE
+############################################
+.vscode/*
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+!.vscode/settings.json
+
+############################################
+# BUILD OUTPUT
+############################################
+build/
+Build/
+build-*/
+bin/
+obj/
+out/
+Debug/
+Release/
+*.map
+*.elf
+*.hex
+*.bin
+*.s19
+*.axf
+
+############################################
+# COMPILER / TOOLCHAIN ARTIFACTS
+############################################
+# Object and dependency files
+*.o
+*.obj
+*.d
+*.ld.d
+
+# Assembly listings
+*.lst
+*.i
+*.su
+
+# Precompiled headers
+*.gch
+*.pch
+
+############################################
+# CMAKE
+############################################
+CMakeFiles/
+CMakeCache.txt
+cmake_install.cmake
+CTestTestfile.cmake
+Makefile
+*.cmake.user
+compile_commands.json
+
+############################################
+# FREERTOS-SPECIFIC BUILD OUTPUT
+############################################
+# FreeRTOS portable layer artifacts
+FreeRTOS/portable/*/*.o
+FreeRTOS/portable/*/*.d
+
+# FreeRTOS+ components cache
+FreeRTOS-Plus/*/build/
+FreeRTOS-Plus/*/*.o
+FreeRTOS-Plus/*/*.d
+
+############################################
+# ANALOG DEVICES MAX SDK / PACKS
+############################################
+# CMSIS Pack temporary build items
+.pack/
+CMSIS/*/Build/
+CMSIS/*/Objects/
+
+# MAXIM Integrated / Analog Devices SDK temp objects
+Libraries/*/build/
+Libraries/*/obj/
+Libraries/*/*.o
+Libraries/*/*.d
+
+# MAX Toolchain metadata
+*.dep
+*.tadt
+*.tlog
+
+############################################
+# PROJECT META
+############################################
+# Logs
+*.log
+*.trace
+*.dbg
+*.stackdump
+
+# Temporary files
+*.tmp
+*.bak
+*.swp
+*.swo
+*.DS_Store
+
+############################################
+# DEBUGGER / PROGRAMMER ARTIFACTS
+############################################
+# OpenOCD
+*.cfg.orig
+
+# Segger J-Link
+JLinkLog.txt
+JLinkSettings.ini
+*.jdebug
+
+# PyOCD
+.pyocd.yaml
+
+############################################
+# EXTERNAL LIBRARIES (OPTIONAL)
+############################################
+# Ignore vendor SDK sets cloned locally
+sdk/
+vendor/
+third_party/*/build/
+third_party/*/*.o
+third_party/*/*.d
+
+############################################
+# PYTHON VENV (if using scripting)
+############################################
 __pycache__/
-*.py[cod]
-*$py.class
-*.so
-.Python
-
-# Ignore everything at root
-/*
-
-# But keep m4 directory
-!/m4/
-
-# Within m4, ignore everything
-/m4/*
-
-# But keep src directory within m4
-!/m4/src/
-
-# Keep configuration files in m4
-!/m4/*.mk
-!/m4/Makefile
-!/m4/FreeRTOSConfig.h
-!/m4/README.md
-!/m4/soc_init.c
-!/m4/soc_init.h
-
-# And keep .gitignore
-!.gitignore
+*.pyc
+venv/
+.env/
