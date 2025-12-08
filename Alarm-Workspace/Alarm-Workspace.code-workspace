@@ -12,6 +12,7 @@
     "cfs.project.target": "MAX32655",
     "terminal.integrated.defaultProfile.windows": "CFS Terminal",
     "terminal.integrated.defaultProfile.osx": "CFS Terminal",
-    "terminal.integrated.defaultProfile.linux": "CFS Terminal"
+    "terminal.integrated.defaultProfile.linux": "CFS Terminal",
+    "cfs.project.board": "FTHR_Apps_P1"
   },
 }
