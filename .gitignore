@@ -22,6 +22,7 @@ Release/
 *.elf
 *.hex
 *.bin
+*.exe
 *.s19
 *.axf
 
