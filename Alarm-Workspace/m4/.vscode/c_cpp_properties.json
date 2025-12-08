@@ -1,0 +1,27 @@
+{
+    "configurations": [
+        {
+            "name": "MAX32655",
+            "includePath": [
+                "${workspaceFolder}/**",
+                "${workspaceFolder}/src",
+                "${env:MAXIM_PATH}/Libraries/CMSIS/Device/Maxim/MAX32655/Include",
+                "${env:MAXIM_PATH}/Libraries/CMSIS/Include",
+                "${env:MAXIM_PATH}/Libraries/PeriphDrivers/Include/MAX32655",
+                "${env:MAXIM_PATH}/Libraries/Boards/MAX32655/FTHR/Include",
+                "${env:MAXIM_PATH}/Libraries/FreeRTOS-Plus/Source/FreeRTOS-Plus-CLI",
+                "${env:MAXIM_PATH}/Libraries/FreeRTOS/Source/include",
+                "${env:MAXIM_PATH}/Libraries/FreeRTOS/Source/portable/GCC/ARM_CM4F"
+            ],
+            "defines": [
+                "TARGET=MAX32655",
+                "TARGET_REV=0x4131"
+            ],
+            "compilerPath": "${env:MAXIM_PATH}/Tools/GNUTools/10.3/bin/arm-none-eabi-gcc.exe",
+            "cStandard": "c11",
+            "cppStandard": "c++17",
+            "intelliSenseMode": "gcc-arm"
+        }
+    ],
+    "version": 4
+}
