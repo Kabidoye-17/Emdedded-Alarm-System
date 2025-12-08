@@ -22,9 +22,11 @@
 void alert_control_init();
 
 // Make the LED show a solid color
-void turn_on_red_LED();
 void turn_on_green_LED();
 void turn_on_blue_LED();
+
+// Make the yellow LED breathe until stopped
+void yellow_breathe_LED();
 
 // Make the red LED breathe until stopped
 void red_LED_breathe();
