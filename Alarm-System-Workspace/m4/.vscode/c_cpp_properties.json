@@ -1,0 +1,184 @@
+{
+  "env": {
+    "cfs.msdk.path": "C:/analog/cfs/2.0.0/SDK/MAX"
+  },
+  "configurations": [
+    {
+      "name": "Win32",
+      "includePath": [
+        "${default}",
+        "${workspaceFolder}",
+        "${workspaceFolder}/**",
+        "${env:cfs.msdk.path}/Libraries/Boards/MAX32655/FTHR_Apps_P1/Include",
+        "${env:cfs.msdk.path}/Libraries/MiscDrivers",
+        "${env:cfs.msdk.path}/Libraries/MiscDrivers/LED",
+        "${env:cfs.msdk.path}/Libraries/MiscDrivers/PushButton",
+        "${env:cfs.msdk.path}/Libraries/MiscDrivers/Display",
+        "${env:cfs.msdk.path}/Libraries/MiscDrivers/Display/fonts/",
+        "${env:cfs.msdk.path}/Libraries/PeriphDrivers/Include/MAX32655/",
+        "${env:cfs.msdk.path}/Libraries/PeriphDrivers/Source/ADC",
+        "${env:cfs.msdk.path}/Libraries/PeriphDrivers/Source/AES",
+        "${env:cfs.msdk.path}/Libraries/PeriphDrivers/Source/CAN",
+        "${env:cfs.msdk.path}/Libraries/PeriphDrivers/Source/DMA",
+        "${env:cfs.msdk.path}/Libraries/PeriphDrivers/Source/FLC",
+        "${env:cfs.msdk.path}/Libraries/PeriphDrivers/Source/GPIO",
+        "${env:cfs.msdk.path}/Libraries/PeriphDrivers/Source/I2C",
+        "${env:cfs.msdk.path}/Libraries/PeriphDrivers/Source/I2S",
+        "${env:cfs.msdk.path}/Libraries/PeriphDrivers/Source/ICC",
+        "${env:cfs.msdk.path}/Libraries/PeriphDrivers/Source/LP",
+        "${env:cfs.msdk.path}/Libraries/PeriphDrivers/Source/PT",
+        "${env:cfs.msdk.path}/Libraries/PeriphDrivers/Source/RTC",
+        "${env:cfs.msdk.path}/Libraries/PeriphDrivers/Source/SPI",
+        "${env:cfs.msdk.path}/Libraries/PeriphDrivers/Source/TMR",
+        "${env:cfs.msdk.path}/Libraries/PeriphDrivers/Source/TRNG",
+        "${env:cfs.msdk.path}/Libraries/PeriphDrivers/Source/UART",
+        "${env:cfs.msdk.path}/Libraries/PeriphDrivers/Source/WDT",
+        "${env:cfs.msdk.path}/Libraries/CMSIS/Device/Maxim/MAX32655/Include",
+        "${env:cfs.msdk.path}/Libraries/CMSIS/5.9.0/Core/Include",
+        "${env:cfs.msdk.path}/Libraries/FreeRTOS-Plus/Source",
+        "${env:cfs.msdk.path}/Libraries/FreeRTOS-Plus/Source/FreeRTOS-Plus-CLI",
+        "${env:cfs.msdk.path}/Libraries/FreeRTOS/Source/include",
+        "${env:cfs.msdk.path}/Libraries/FreeRTOS/Source/portable/GCC/ARM_CM4F"
+      ],
+      "defines": [
+        "${config:cfs.project.board}",
+        "TARGET=MAX32655",
+        "__GNUC__"
+      ],
+      "intelliSenseMode": "gcc-arm",
+      "compilerPath": "${config:cfs.toolchain.armAArch32GCC.path}/bin/arm-none-eabi-gcc.exe",
+      "browse": {
+        "path": [
+          "${default}",
+          "${workspaceFolder}",
+          "${workspaceFolder}/**",
+          "${env:cfs.msdk.path}/Libraries/CMSIS/Device/Maxim/MAX32655/Source",
+          "${env:cfs.msdk.path}/Libraries/Boards/MAX32655/FTHR_Apps_P1/Source",
+          "${env:cfs.msdk.path}/Libraries/MiscDrivers",
+          "${env:cfs.msdk.path}/Libraries/MiscDrivers/LED",
+          "${env:cfs.msdk.path}/Libraries/MiscDrivers/PushButton",
+          "${env:cfs.msdk.path}/Libraries/MiscDrivers/Display",
+          "${env:cfs.msdk.path}/Libraries/MiscDrivers/Display/fonts/",
+          "${env:cfs.msdk.path}/Libraries/CMSIS/Device/Maxim/MAX32655/Source/GCC"
+        ]
+      }
+    },
+    {
+      "name": "Linux",
+      "includePath": [
+        "${default}",
+        "${env:cfs.msdk.path}/Libraries/Boards/MAX32655/FTHR_Apps_P1/Include",
+        "${env:cfs.msdk.path}/Libraries/MiscDrivers",
+        "${env:cfs.msdk.path}/Libraries/MiscDrivers/LED",
+        "${env:cfs.msdk.path}/Libraries/MiscDrivers/PushButton",
+        "${env:cfs.msdk.path}/Libraries/MiscDrivers/Display",
+        "${env:cfs.msdk.path}/Libraries/MiscDrivers/Display/fonts/",
+        "${env:cfs.msdk.path}/Libraries/PeriphDrivers/Include/MAX32655/",
+        "${env:cfs.msdk.path}/Libraries/PeriphDrivers/Source/ADC",
+        "${env:cfs.msdk.path}/Libraries/PeriphDrivers/Source/AES",
+        "${env:cfs.msdk.path}/Libraries/PeriphDrivers/Source/CAN",
+        "${env:cfs.msdk.path}/Libraries/PeriphDrivers/Source/DMA",
+        "${env:cfs.msdk.path}/Libraries/PeriphDrivers/Source/FLC",
+        "${env:cfs.msdk.path}/Libraries/PeriphDrivers/Source/GPIO",
+        "${env:cfs.msdk.path}/Libraries/PeriphDrivers/Source/I2C",
+        "${env:cfs.msdk.path}/Libraries/PeriphDrivers/Source/I2S",
+        "${env:cfs.msdk.path}/Libraries/PeriphDrivers/Source/ICC",
+        "${env:cfs.msdk.path}/Libraries/PeriphDrivers/Source/LP",
+        "${env:cfs.msdk.path}/Libraries/PeriphDrivers/Source/PT",
+        "${env:cfs.msdk.path}/Libraries/PeriphDrivers/Source/RTC",
+        "${env:cfs.msdk.path}/Libraries/PeriphDrivers/Source/SPI",
+        "${env:cfs.msdk.path}/Libraries/PeriphDrivers/Source/TMR",
+        "${env:cfs.msdk.path}/Libraries/PeriphDrivers/Source/TRNG",
+        "${env:cfs.msdk.path}/Libraries/PeriphDrivers/Source/UART",
+        "${env:cfs.msdk.path}/Libraries/PeriphDrivers/Source/WDT",
+        "${env:cfs.msdk.path}/Libraries/CMSIS/Device/Maxim/MAX32655/Include",
+        "${env:cfs.msdk.path}/Libraries/CMSIS/5.9.0/Core/Include",
+        "${env:cfs.msdk.path}/Libraries/FreeRTOS-Plus/Source",
+        "${env:cfs.msdk.path}/Libraries/FreeRTOS-Plus/Source/FreeRTOS-Plus-CLI",
+        "${env:cfs.msdk.path}/Libraries/FreeRTOS/Source/include",
+        "${env:cfs.msdk.path}/Libraries/FreeRTOS/Source/portable/GCC/ARM_CM4F"
+      ],
+      "defines": [
+        "${config:cfs.project.board}",
+        "TARGET=MAX32655",
+        "__GNUC__"
+      ],
+      "intelliSenseMode": "gcc-arm",
+      "compilerPath": "${config:cfs.toolchain.armAArch32GCC.path}/bin/arm-none-eabi-gcc",
+      "browse": {
+        "path": [
+          "${default}",
+          "${workspaceFolder}",
+          "${workspaceFolder}/**",
+          "${env:cfs.msdk.path}/Libraries/CMSIS/Device/Maxim/MAX32655/Source",
+          "${env:cfs.msdk.path}/Libraries/Boards/MAX32655/FTHR_Apps_P1/Source",
+          "${env:cfs.msdk.path}/Libraries/MiscDrivers",
+          "${env:cfs.msdk.path}/Libraries/MiscDrivers/LED",
+          "${env:cfs.msdk.path}/Libraries/MiscDrivers/PushButton",
+          "${env:cfs.msdk.path}/Libraries/MiscDrivers/Display",
+          "${env:cfs.msdk.path}/Libraries/MiscDrivers/Display/fonts/",
+          "${env:cfs.msdk.path}/Libraries/CMSIS/Device/Maxim/MAX32655/Source/GCC"
+        ]
+      }
+    },
+    {
+      "name": "Mac",
+      "includePath": [
+        "${default}",
+        "${env:cfs.msdk.path}/Libraries/Boards/MAX32655/FTHR_Apps_P1/Include",
+        "${env:cfs.msdk.path}/Libraries/MiscDrivers",
+        "${env:cfs.msdk.path}/Libraries/MiscDrivers/LED",
+        "${env:cfs.msdk.path}/Libraries/MiscDrivers/PushButton",
+        "${env:cfs.msdk.path}/Libraries/MiscDrivers/Display",
+        "${env:cfs.msdk.path}/Libraries/MiscDrivers/Display/fonts/",
+        "${env:cfs.msdk.path}/Libraries/PeriphDrivers/Include/MAX32655/",
+        "${env:cfs.msdk.path}/Libraries/PeriphDrivers/Source/ADC",
+        "${env:cfs.msdk.path}/Libraries/PeriphDrivers/Source/AES",
+        "${env:cfs.msdk.path}/Libraries/PeriphDrivers/Source/CAN",
+        "${env:cfs.msdk.path}/Libraries/PeriphDrivers/Source/DMA",
+        "${env:cfs.msdk.path}/Libraries/PeriphDrivers/Source/FLC",
+        "${env:cfs.msdk.path}/Libraries/PeriphDrivers/Source/GPIO",
+        "${env:cfs.msdk.path}/Libraries/PeriphDrivers/Source/I2C",
+        "${env:cfs.msdk.path}/Libraries/PeriphDrivers/Source/I2S",
+        "${env:cfs.msdk.path}/Libraries/PeriphDrivers/Source/ICC",
+        "${env:cfs.msdk.path}/Libraries/PeriphDrivers/Source/LP",
+        "${env:cfs.msdk.path}/Libraries/PeriphDrivers/Source/PT",
+        "${env:cfs.msdk.path}/Libraries/PeriphDrivers/Source/RTC",
+        "${env:cfs.msdk.path}/Libraries/PeriphDrivers/Source/SPI",
+        "${env:cfs.msdk.path}/Libraries/PeriphDrivers/Source/TMR",
+        "${env:cfs.msdk.path}/Libraries/PeriphDrivers/Source/TRNG",
+        "${env:cfs.msdk.path}/Libraries/PeriphDrivers/Source/UART",
+        "${env:cfs.msdk.path}/Libraries/PeriphDrivers/Source/WDT",
+        "${env:cfs.msdk.path}/Libraries/CMSIS/Device/Maxim/MAX32655/Include",
+        "${env:cfs.msdk.path}/Libraries/CMSIS/5.9.0/Core/Include",
+        "${env:cfs.msdk.path}/Libraries/FreeRTOS-Plus/Source",
+        "${env:cfs.msdk.path}/Libraries/FreeRTOS-Plus/Source/FreeRTOS-Plus-CLI",
+        "${env:cfs.msdk.path}/Libraries/FreeRTOS/Source/include",
+        "${env:cfs.msdk.path}/Libraries/FreeRTOS/Source/portable/GCC/ARM_CM4F"
+      ],
+      "defines": [
+        "${config:cfs.project.board}",
+        "TARGET=MAX32655",
+        "__GNUC__"
+      ],
+      "intelliSenseMode": "gcc-arm",
+      "compilerPath": "${config:cfs.toolchain.armAArch32GCC.path}/bin/arm-none-eabi-gcc",
+      "browse": {
+        "path": [
+          "${default}",
+          "${workspaceFolder}",
+          "${workspaceFolder}/**",
+          "${env:cfs.msdk.path}/Libraries/CMSIS/Device/Maxim/MAX32655/Source",
+          "${env:cfs.msdk.path}/Libraries/Boards/MAX32655/FTHR_Apps_P1/Source",
+          "${env:cfs.msdk.path}/Libraries/MiscDrivers",
+          "${env:cfs.msdk.path}/Libraries/MiscDrivers/LED",
+          "${env:cfs.msdk.path}/Libraries/MiscDrivers/PushButton",
+          "${env:cfs.msdk.path}/Libraries/MiscDrivers/Display",
+          "${env:cfs.msdk.path}/Libraries/MiscDrivers/Display/fonts/",
+          "${env:cfs.msdk.path}/Libraries/CMSIS/Device/Maxim/MAX32655/Source/GCC"
+        ]
+      }
+    }
+  ],
+  "version": 4
+}

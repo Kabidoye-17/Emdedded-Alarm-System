@@ -30,9 +30,6 @@
 # Add library dependencies
 include config.mk
 
-# Tell FreeRTOS where to find FreeRTOSConfig.h
-RTOS_CONFIG_DIR = $(CURDIR)
-
 # Touch project.mk if config.mk changes, so that we rebuild all sources and libraries
 CONFIGMK ?= $(abspath ./config.mk)
 $(PROJECTMK): $(CONFIGMK)
