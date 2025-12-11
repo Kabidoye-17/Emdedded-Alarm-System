@@ -24,17 +24,15 @@
 #include "pb.h"
 #include "board.h"
 #include "uart_coms.h"
-#include "json_helper.h"
 
 // Shared data protected by semaphore
 static command_event latest_event;
 static SemaphoreHandle_t event_semaphore;
 
-// UART callback - gives semaphore on successful parse
-void on_message_received(const char* json_str) {
-    if (parse_command_event(json_str, &latest_event) == 0) {
-        xSemaphoreGiveFromISR(event_semaphore, NULL);
-    }
+// UART callback - gives semaphore on successful command reception
+void on_message_received(command_type cmd) {
+    latest_event.cmd = cmd;
+    xSemaphoreGiveFromISR(event_semaphore, NULL);
 }
 
 // Task: Process commands

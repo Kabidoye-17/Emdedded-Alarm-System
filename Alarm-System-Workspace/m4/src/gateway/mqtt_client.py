@@ -9,11 +9,17 @@ class MQTTClient:
         self.broker = mqtt_config.broker
         self.port = mqtt_config.port
         self.keep_alive = mqtt_config.keep_alive
+        self.username = mqtt_config.username
+        self.password = mqtt_config.password
         self._is_connected = False
 
         # Set default callbacks
         self.client.on_connect = self._on_connect
         self.client.on_disconnect = self._on_disconnect
+
+        if self.username:
+            # Configure broker authentication when credentials are provided
+            self.client.username_pw_set(self.username, self.password)
 
     def _on_connect(self, _client, _userdata, _flags, rc):
         """Default connection callback"""
