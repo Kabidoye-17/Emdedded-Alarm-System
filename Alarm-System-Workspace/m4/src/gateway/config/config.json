@@ -12,5 +12,15 @@
   },
   "topics": {
     "command": "topic/command_event"
+  },
+  "commands": {
+    "valid_uart_commands": ["ARM", "DISARM", "RESOLVE"],
+    "mqtt_command_payload_key": "commandValue"
+  },
+  "protocol": {
+    "stx": 2,
+    "etx": 3,
+    "max_data_length": 16,
+    "encoding": "ascii"
   }
 }

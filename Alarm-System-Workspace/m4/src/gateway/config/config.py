@@ -2,7 +2,7 @@ import json
 import os
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Optional
+from typing import Optional, List
 
 @dataclass
 class MQTTConfig:
@@ -20,6 +20,18 @@ class UARTConfig:
 @dataclass
 class TopicsConfig:
     command: str
+
+@dataclass
+class CommandsConfig:
+    valid_uart_commands: List[str]
+    mqtt_command_payload_key: str
+
+@dataclass
+class ProtocolConfig:
+    stx: int
+    etx: int
+    max_data_length: int
+    encoding: str
 
 def load_config():
     """Load configuration from config.json file"""
@@ -44,10 +56,12 @@ def load_config():
         return (
             mqtt_config,
             UARTConfig(**config_data['uart']),
-            TopicsConfig(**config_data['topics'])
+            TopicsConfig(**config_data['topics']),
+            CommandsConfig(**config_data['commands']),
+            ProtocolConfig(**config_data['protocol'])
         )
     except Exception as e:
         raise RuntimeError(f"Failed to load configuration: {str(e)}")
 
 # Load configs once when module is imported
-mqtt, uart, topics = load_config()
+mqtt, uart, topics, commands, protocol = load_config()
