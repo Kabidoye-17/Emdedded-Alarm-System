@@ -1,8 +1,10 @@
 {
   "mqtt": {
-    "broker": "localhost",
+    "broker": "alderaan.software-engineering.ie",
     "port": 1883,
-    "keep_alive": 60
+    "keep_alive": 60,
+    "username": "kelly@alderaan.software-engineering.ie",
+    "password": null
   },
   "uart": {
     "port": "COM12",

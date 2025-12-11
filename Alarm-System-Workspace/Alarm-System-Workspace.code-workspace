@@ -12,6 +12,8 @@
     "cfs.project.target": "MAX32655",
     "terminal.integrated.defaultProfile.windows": "CFS Terminal",
     "terminal.integrated.defaultProfile.osx": "CFS Terminal",
-    "terminal.integrated.defaultProfile.linux": "CFS Terminal"
+    "terminal.integrated.defaultProfile.linux": "CFS Terminal",
+    "cfs.project.board": "EvKit_V1",
+    "cfs.project.firmwarePlatform": "MSDK"
   },
 }
