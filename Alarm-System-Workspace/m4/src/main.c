@@ -19,56 +19,58 @@
 #include "FreeRTOS.h"
 #include "task.h"
 #include "semphr.h"
+#include "queue.h"
 #include "mxc_device.h"
 #include "led.h"
 #include "pb.h"
 #include "board.h"
 #include "uart_coms.h"
 
-// Shared data protected by semaphore
-static command_event latest_event;
-static SemaphoreHandle_t event_semaphore;
+// Command queue for ISR-to-task communication
+#define COMMAND_QUEUE_LENGTH 10
+static QueueHandle_t command_queue = NULL;
 
-// UART callback - gives semaphore on successful command reception
+// UART callback - sends command to queue from ISR context
 void on_message_received(command_type cmd) {
-    latest_event.cmd = cmd;
-    xSemaphoreGiveFromISR(event_semaphore, NULL);
+    command_event event;
+    event.cmd = cmd;
+
+    BaseType_t xHigherPriorityTaskWoken = pdFALSE;
+
+    // Attempt to send to queue
+    if (xQueueSendFromISR(command_queue, &event, &xHigherPriorityTaskWoken) != pdPASS) {
+        // Queue full - drop oldest command to make room
+        command_event discarded_event;
+        xQueueReceiveFromISR(command_queue, &discarded_event, &xHigherPriorityTaskWoken);
+
+        // Retry sending new command (should succeed now)
+        xQueueSendFromISR(command_queue, &event, &xHigherPriorityTaskWoken);
+    }
+
+    // Yield to higher priority task if necessary
+    portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
 }
 
-// Task: Process commands
+// Task: Placeholder (your friend will add consumer logic for state machine)
 void command_task(void *pvParameters) {
     while (1) {
-        // Wait for semaphore from UART callback
-        if (xSemaphoreTake(event_semaphore, portMAX_DELAY) == pdTRUE) {
-            // Flash LED based on command type
-            switch (latest_event.cmd) {
-                case ARM:
-                    LED_On(LED_RED);
-                    vTaskDelay(pdMS_TO_TICKS(200));
-                    LED_Off(LED_RED);
-                    break;
-                case DISARM:
-                    LED_On(LED_GREEN);
-                    vTaskDelay(pdMS_TO_TICKS(200));
-                    LED_Off(LED_GREEN);
-                    break;
-                case RESOLVE:
-                    LED_On(LED_BLUE);
-                    vTaskDelay(pdMS_TO_TICKS(200));
-                    LED_Off(LED_BLUE);
-                    break;
-                default:
-                    break;
-            }
-        }
+        // Placeholder - no consumption happening
+        // This allows the queue to fill up for testing overflow behavior
+        vTaskDelay(pdMS_TO_TICKS(1000));
     }
 }
 
 int main(void) {
     printf("Alarm System Starting...\n");
 
-    // Create binary semaphore for signaling
-    event_semaphore = xSemaphoreCreateBinary();
+    // Create command queue with depth 10
+    command_queue = xQueueCreate(COMMAND_QUEUE_LENGTH, sizeof(command_event));
+
+    // Error handling - critical system component
+    if (command_queue == NULL) {
+        printf("FATAL: Failed to create command queue\n");
+        while(1);  // Halt system
+    }
 
     // Initialize UART
     uart_init(on_message_received);
