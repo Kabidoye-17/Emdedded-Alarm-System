@@ -1,12 +1,16 @@
 import json
+import os
 from dataclasses import dataclass
 from pathlib import Path
+from typing import Optional
 
 @dataclass
 class MQTTConfig:
     broker: str
     port: int
     keep_alive: int
+    username: str
+    password: Optional[str] = None
 
 @dataclass
 class UARTConfig:
@@ -28,8 +32,17 @@ def load_config():
         with open(config_path, 'r') as f:
             config_data = json.load(f)
 
+        mqtt_data = config_data['mqtt']
+        mqtt_config = MQTTConfig(
+            broker=mqtt_data['broker'],
+            port=mqtt_data['port'],
+            keep_alive=mqtt_data['keep_alive'],
+            username=mqtt_data['username'],
+            password=os.getenv('MQTT_PASSWORD', mqtt_data.get('password')),
+        )
+
         return (
-            MQTTConfig(**config_data['mqtt']),
+            mqtt_config,
             UARTConfig(**config_data['uart']),
             TopicsConfig(**config_data['topics'])
         )
