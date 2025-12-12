@@ -2,47 +2,39 @@
 #define STATE_MACHINE_H
 
 #include <stdint.h>
+#include "typing.h"
 
 /*
  * Alarm system state machine.
  * Transitions occur through events such as arm/disarm and warn levels.
  */
 
-// Actual states of the alarm system
-enum alarm_state {
-	ALARM_STATE_DISARMED = 0,
-	ALARM_STATE_ARMED_IDLE,
-	ALARM_STATE_WARN,
-	ALARM_STATE_ALERT,
-	ALARM_STATE_ALARM,
-};
-
 // State change triggers
-enum alarm_event {
-	ALARM_EVENT_ARM_SYSTEM = 0,
-	ALARM_EVENT_DISARM_SYSTEM,
-	ALARM_EVENT_LOW_WARN,
-	ALARM_EVENT_MED_WARN,
-	ALARM_EVENT_HIGH_WARN,
-	ALARM_EVENT_RESOLVE_ALARM,
-	ALARM_EVENT_CANCEL_WARN, // Produced when timeouts occurs
-};
+typedef enum alarm_event {
+	ARM_SYSTEM = 0,
+	DISARM_SYSTEM,
+	LOW_WARN,
+	MED_WARN,
+	HIGH_WARN,
+	RESOLVE_ALARM,
+	CANCEL_WARN, // Produced when timeouts occurs
+} alarm_event;
 
 // State machine structure (Just a container for current state)
-struct alarm_sm {
-	enum alarm_state state;
-};
+typedef struct alarm_sm {
+	alarm_state state;
+} alarm_sm;
 
-// Set state to default state (ALARM_STATE_DISARMED)
-void alarm_sm_init(struct alarm_sm *sm);
+// Set state to default state (DISARMED)
+void alarm_sm_init(alarm_sm *sm);
 
 // Handle alarm event and perform state transition if necessary
-void alarm_sm_handle_event(struct alarm_sm *sm, enum alarm_event event);
+void alarm_sm_handle_event(alarm_sm *sm, alarm_event event);
 
 // Get current state of the state machine
-enum alarm_state alarm_sm_state(const struct alarm_sm *sm);
+alarm_state alarm_sm_state(const alarm_sm *sm);
 
 /// Get string name of the given state
-const char *alarm_state_name(enum alarm_state state);
+const char *alarm_state_name(alarm_state state);
 
 #endif /* STATE_MACHINE_H */
