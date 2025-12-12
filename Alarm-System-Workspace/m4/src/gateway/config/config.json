@@ -11,7 +11,8 @@
     "baudrate": 115200
   },
   "topics": {
-    "command": "topic/command_event"
+    "command": "topic/command_event",
+    "telemetry": "topic/telemetry"
   },
   "commands": {
     "valid_uart_commands": ["ARM", "DISARM", "RESOLVE"],

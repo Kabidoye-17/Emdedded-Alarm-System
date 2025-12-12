@@ -14,6 +14,7 @@
     "terminal.integrated.defaultProfile.osx": "CFS Terminal",
     "terminal.integrated.defaultProfile.linux": "CFS Terminal",
     "cfs.project.board": "EvKit_V1",
-    "cfs.project.firmwarePlatform": "MSDK"
+    "cfs.project.firmwarePlatform": "MSDK",
+    "cfs.activeContext": "m4"
   },
 }

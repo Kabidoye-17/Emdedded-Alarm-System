@@ -51,6 +51,14 @@ void on_message_received(command_type cmd) {
     portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
 }
 
+// Task: LED debug task - flashes blue LED to indicate board is running
+void led_debug_task(void *pvParameters) {
+    while (1) {
+        LED_Toggle(LED_BLUE);
+        vTaskDelay(pdMS_TO_TICKS(500));  // Flash every 500ms
+    }
+}
+
 // Task: Placeholder (your friend will add consumer logic for state machine)
 void command_task(void *pvParameters) {
     while (1) {
@@ -74,6 +82,16 @@ int main(void) {
 
     // Initialize UART
     uart_init(on_message_received);
+
+    // Create LED debug task (low priority, just for visual confirmation)
+    xTaskCreate(
+        led_debug_task,
+        "LED_Debug",
+        configMINIMAL_STACK_SIZE,
+        NULL,
+        1,
+        NULL
+    );
 
     // Create command task
     xTaskCreate(

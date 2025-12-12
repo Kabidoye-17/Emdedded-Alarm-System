@@ -1,7 +1,7 @@
 ############################################
 # VS CODE
 ############################################
-.vscode/*
+*.vscode/*
 !.vscode/tasks.json
 !.vscode/launch.json
 !.vscode/extensions.json
@@ -51,7 +51,6 @@ CMakeFiles/
 CMakeCache.txt
 cmake_install.cmake
 CTestTestfile.cmake
-Makefile
 *.cmake.user
 compile_commands.json
 
@@ -133,3 +132,5 @@ __pycache__/
 *.pyc
 venv/
 .env/
+nul
+Alarm-System-Workspace/.cfs/.claude/settings.local.json
