@@ -158,11 +158,13 @@ export CMSIS_ROOT
 VPATH += .
 VPATH += src
 VPATH := $(VPATH)
+VPATH += src/alarm
 
 # Where to find header files for this project
 IPATH += .
 IPATH += include
 IPATH := $(IPATH)
+IPATH += src/alarm
 
 AUTOSEARCH ?= 1
 ifeq ($(AUTOSEARCH), 1)
