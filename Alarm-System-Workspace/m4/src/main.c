@@ -30,11 +30,18 @@
 #include "spi.h"
 #include "mxc_pins.h"
 #include "gpio.h"
+#include "adxl343_motion.h"
+#include "watchdog.h"
+#include "watchdog.h"
+#include "wdt.h"
+
 
 /***** SPI pins *****/
 #define MOSI_PIN 21
 #define MISO_PIN 22
 #define FTHR_Defined 1
+
+QueueHandle_t motionQueue;
 
 // Command queue for ISR-to-task communication
 #define COMMAND_QUEUE_LENGTH 10
@@ -80,7 +87,12 @@ void command_task(void *pvParameters) {
 
 int main(void) {
 
-    // setting up ADXL343
+     if (MXC_WDT_GetResetFlag(MXC_WDT0)) {
+        MXC_WDT_ClearResetFlag(MXC_WDT0);
+    }
+
+    setvbuf(stdout, NULL, _IONBF, 0);
+
     int retVal;
     mxc_spi_pins_t spi_pins;
     int selected_ss = -1;
@@ -114,7 +126,15 @@ int main(void) {
     if (retVal != E_NO_ERROR)
         return retVal;
 
-    printf("ADXL343 detected on SS%d\n", selected_ss);
+
+    motionQueue = xQueueCreate(8, sizeof(MotionEvent));
+
+
+    adxl343_motion_start(
+        motionQueue,
+        configMAX_PRIORITIES - 1,
+        512
+    );
 
 
     printf("Alarm System Starting...\n");
@@ -151,8 +171,18 @@ int main(void) {
         NULL
     );
 
-    // Start scheduler
+     watchdog_init();
+
+    xTaskCreate(
+        WatchdogTask,
+        "WDT",
+        256,
+        NULL,
+        tskIDLE_PRIORITY + 1,
+        NULL
+    );
+
+
     vTaskStartScheduler();
-    
-    return 0;
+    while (1);
 }
