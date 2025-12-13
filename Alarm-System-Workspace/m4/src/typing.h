@@ -3,7 +3,7 @@
 
 #include <stdint.h>
 
-#define MAX_TIMESTAMP_LENGTH 20
+#define MAX_TIMESTAMP_LENGTH 32
 
 // ===================== ENUMS =====================
 
@@ -18,7 +18,8 @@ typedef enum warn_type {
 typedef enum command_type {
     ARM,
     DISARM,
-    RESOLVE_ALARM
+    RESOLVE_ALARM,
+    CANCEL_WARN
 } command_type;
 
 // -> actual states of the alarm system

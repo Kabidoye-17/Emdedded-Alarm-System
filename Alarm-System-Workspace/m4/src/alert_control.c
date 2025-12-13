@@ -1,6 +1,7 @@
 #include <string.h>
 #include "FreeRTOS.h"
 #include "task.h"
+#include "timers.h"
 #include "alarm/state_machine.h"
 #include "alarm/alert_outputs.h"
 #include "alarm/led_driver.h"
@@ -8,6 +9,8 @@
 
 QueueSetHandle_t alert_queue_set;
 #define SET_LENGTH (MOTION_QUEUE_LENGTH + COMMAND_QUEUE_LENGTH)
+
+static TimerHandle_t warn_timeout_timer;
 
 
 // Drive the physical alerts for the current state. 
@@ -54,6 +57,8 @@ static alarm_event command_to_alarm_event(command_type cmd) {
             return EVENT_DISARM_SYSTEM;
         case RESOLVE_ALARM:
             return EVENT_RESOLVE_ALARM;
+        case CANCEL_WARN:
+            return EVENT_CANCEL_WARN;
         default:
             return EVENT_ARM_SYSTEM;
     }
@@ -62,6 +67,11 @@ static alarm_event command_to_alarm_event(command_type cmd) {
 int send_cloud_update(cloud_update_event* update) {
     int result = xQueueSend(cloud_update_queue, update, portMAX_DELAY);
     return result;
+}
+
+static void warn_timeout_callback(TimerHandle_t xTimer) {
+    command_event cancel_cmd = {.cmd = CANCEL_WARN};
+    xQueueSend(command_queue, &cancel_cmd, 0);
 }
 
 // Only this task touches LEDs
@@ -74,6 +84,12 @@ void AlertControlTask(void *arg){
 
     xQueueAddToSet(motion_queue, alert_queue_set);
     xQueueAddToSet(command_queue, alert_queue_set);
+    
+    warn_timeout_timer = xTimerCreate("WarnTimeout",
+                                      pdMS_TO_TICKS(5000), // 5 second timeout
+                                      pdFALSE,
+                                      NULL,
+                                      warn_timeout_callback);
     
     while (1) {
         QueueSetMemberHandle_t activated_queue;
@@ -91,6 +107,14 @@ void AlertControlTask(void *arg){
             alarm_state new_state = alarm_sm_state(&alarm_machine);
             if (new_state != old_state) {
                 apply_alerts(alarm_machine.state);
+                // Start warn timeout if entering WARN state
+                if (new_state == WARN) {
+                    xTimerStart(warn_timeout_timer, 0);
+                }
+                // Stop warn timeout if leaving WARN state
+                if (old_state == WARN && new_state != WARN) {
+                    xTimerStop(warn_timeout_timer, 0);
+                }
                 cloud_update_event update = {0};
                 update.from_motion = 1;
                 update.warning = m_e.warning;
@@ -109,6 +133,10 @@ void AlertControlTask(void *arg){
             alarm_state new_state = alarm_sm_state(&alarm_machine);
             if (new_state != old_state) {
                 apply_alerts(alarm_machine.state);
+                // Stop warn timeout if leaving WARN state
+                if (old_state == WARN && new_state != WARN) {
+                    xTimerStop(warn_timeout_timer, 0);
+                }
                 cloud_update_event update = {0};
                 update.from_motion = 0;
                 update.state = new_state;
