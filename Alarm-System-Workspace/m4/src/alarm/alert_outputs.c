@@ -77,15 +77,3 @@ static void LedEffectTask(void *arg) {
         vTaskDelay(pdMS_TO_TICKS(60));
     }
 }
-
-void alert_outputs_init() {
-    init_GPIO_for_LEDs();
-    xTaskCreate(
-        LedEffectTask,
-        "LEDEffects",
-        512,
-        NULL,
-        1,        // task priority -> fix
-        NULL
-    );
-}
