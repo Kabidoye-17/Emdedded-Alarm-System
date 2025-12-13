@@ -1,41 +1,16 @@
 #ifndef ALERT_OUTPUTS_H
 #define ALERT_OUTPUTS_H
 
-/*
- * Alert control for the alarm system.
- * Manages visual and auditory alerts based on the alarm state.
- * Always at least one alert should be active based on the current state.
- * 
- * The alert priorities are as follows (highest to lowest):
- * 1. ALARM_STATE_ALARM: Red LED flashing + siren on
- * 2. ALARM_STATE_ALERT: Red LED breathing
- * 3. ALARM_STATE_WARN: Solid red LED
- * 4. ALARM_STATE_ARMED_IDLE: Solid blue LED
- * 5. ALARM_STATE_DISARMED: Solid green LED
- * 
- * No two alerts can be active at the same time (state machine).
- * Higher priority alerts override lower priority ones.
- */
+typedef enum {
+    OFF = 0,
+    BLUE,
+    GREEN,
+    RED,
+    RED_BREATHE,
+    RED_FLASH
+} LedMode;
 
-
-// Initialize alert control system
-void alert_outputs_init();
-
-// Make the LED show a solid color
-void turn_on_green_LED();
-void turn_on_blue_LED();
-
-// Make the yellow LED breathe until stopped
-void yellow_breathe_LED();
-
-// Make the red LED breathe until stopped
-void red_LED_breathe();
-
-// Make the red LED flash until stopped
-void red_LED_flash();
-
-// Stop any ongoing LED effects
-void stop_LED_effects();
-
+void alert_outputs_set_mode(LedMode mode);
+void alert_outputs_init(void);
 
 #endif /* ALERT_OUTPUTS_H */
