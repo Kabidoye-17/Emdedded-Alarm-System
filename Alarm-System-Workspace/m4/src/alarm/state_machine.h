@@ -2,7 +2,7 @@
 #define STATE_MACHINE_H
 
 #include <stdint.h>
-#include "typing.h"
+#include "../typing.h"
 
 /*
  * Alarm system state machine.
@@ -11,13 +11,13 @@
 
 // State change triggers
 typedef enum alarm_event {
-	ARM_SYSTEM = 0,
-	DISARM_SYSTEM,
-	LOW_WARN,
-	MED_WARN,
-	HIGH_WARN,
-	RESOLVE_ALARM,
-	CANCEL_WARN, // Produced when timeouts occurs
+	EVENT_ARM_SYSTEM = 0,
+	EVENT_DISARM_SYSTEM,
+	EVENT_LOW_WARN,
+	EVENT_MED_WARN,
+	EVENT_HIGH_WARN,
+	EVENT_RESOLVE_ALARM,
+	EVENT_CANCEL_WARN // Produced when timeouts occurs
 } alarm_event;
 
 // State machine structure (Just a container for current state)

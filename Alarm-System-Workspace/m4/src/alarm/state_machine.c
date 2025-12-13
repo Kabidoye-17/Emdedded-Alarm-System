@@ -2,7 +2,7 @@
 
 static alarm_state transition(alarm_state state, alarm_event event) {
 	switch (event) {
-	case DISARM_SYSTEM:
+	case EVENT_DISARM_SYSTEM:
 		return DISARMED;
 	default:
 		break;
@@ -10,31 +10,31 @@ static alarm_state transition(alarm_state state, alarm_event event) {
 
 	switch (state) {
 	case DISARMED:
-		if (event == ARM_SYSTEM)
+		if (event == EVENT_ARM_SYSTEM)
 			return ARMED_IDLE;
 		break;
 	case ARMED_IDLE:
-		if (event == LOW_WARN)
+		if (event == EVENT_LOW_WARN)
 			return WARN;
-		if (event == MED_WARN)
+		if (event == EVENT_MED_WARN)
 			return ALERT;
-		if (event == HIGH_WARN)
+		if (event == EVENT_HIGH_WARN)
 			return ALARM;
 		break;
 	case WARN:
-		if (event == CANCEL_WARN)
+		if (event == EVENT_CANCEL_WARN)
 			return ARMED_IDLE;
-		if (event == MED_WARN)
+		if (event == EVENT_MED_WARN)
 			return ALERT;
 		break;
 	case ALERT:
-		if (event == HIGH_WARN)
+		if (event == EVENT_HIGH_WARN)
 			return ALARM;
-		if (event == RESOLVE_ALARM)
+		if (event == EVENT_RESOLVE_ALARM)
 			return ARMED_IDLE;
 		break;
 	case ALARM:
-		if (event == RESOLVE_ALARM)
+		if (event == EVENT_RESOLVE_ALARM)
 			return ARMED_IDLE;
 		break;
 	default:
