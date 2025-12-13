@@ -25,6 +25,16 @@
 #include "pb.h"
 #include "board.h"
 #include "uart_coms.h"
+#include "adxl343.h"
+#include "mxc_delay.h"
+#include "spi.h"
+#include "mxc_pins.h"
+#include "gpio.h"
+
+/***** SPI pins *****/
+#define MOSI_PIN 21
+#define MISO_PIN 22
+#define FTHR_Defined 1
 
 // Command queue for ISR-to-task communication
 #define COMMAND_QUEUE_LENGTH 10
@@ -69,6 +79,44 @@ void command_task(void *pvParameters) {
 }
 
 int main(void) {
+
+    // setting up ADXL343
+    int retVal;
+    mxc_spi_pins_t spi_pins;
+    int selected_ss = -1;
+
+    spi_pins.clock = TRUE;
+    spi_pins.miso  = TRUE;
+    spi_pins.mosi  = TRUE;
+    spi_pins.sdio2 = FALSE;
+    spi_pins.sdio3 = FALSE;
+    spi_pins.ss0   = TRUE;
+    spi_pins.ss1   = TRUE;
+    spi_pins.ss2   = FALSE;
+
+    retVal = adxl343_spi_init(&spi_pins);
+    if (retVal != E_NO_ERROR)
+        return retVal;
+
+    const int ss_candidates[] = {1, 0};
+    for (unsigned i = 0; i < 2; i++) {
+        adxl343_set_ss(ss_candidates[i]);
+        if (adxl343_probe() == E_NO_ERROR) {
+            selected_ss = ss_candidates[i];
+            break;
+        }
+    }
+
+    if (selected_ss < 0)
+        return -1;
+
+    retVal = adxl343_init();
+    if (retVal != E_NO_ERROR)
+        return retVal;
+
+    printf("ADXL343 detected on SS%d\n", selected_ss);
+
+
     printf("Alarm System Starting...\n");
 
     // Create command queue with depth 10
