@@ -17,6 +17,7 @@
  * Higher priority alerts override lower priority ones.
  */
 
+void init_GPIO_for_LEDs(void);
 
 void turn_on_green_LED(void);
 
