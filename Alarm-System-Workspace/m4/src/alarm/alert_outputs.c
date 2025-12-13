@@ -20,7 +20,7 @@ void alert_outputs_set_mode(LedMode mode) {
     taskEXIT_CRITICAL();
 }
 
-static void LedEffectTask(void *arg) {
+void LedEffectTask(void *arg) {
     LedMode last_mode = OFF;
 
     while (1) {

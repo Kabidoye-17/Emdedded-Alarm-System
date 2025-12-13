@@ -7,7 +7,6 @@
 #include "alarm/alert_outputs.h"
 
 void create_LED_control_task(void) {
-    init_GPIO_for_LEDs();
     xTaskCreate(LedEffectTask, "LEDEffects", 512, NULL, 1,NULL);
 }
 
