@@ -11,6 +11,6 @@ typedef enum {
 } LedMode;
 
 void alert_outputs_set_mode(LedMode mode);
-void alert_outputs_init(void);
+static void LedEffectTask(void *arg);
 
 #endif /* ALERT_OUTPUTS_H */
