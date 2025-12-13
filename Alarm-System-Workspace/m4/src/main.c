@@ -34,6 +34,8 @@
 #include "watchdog.h"
 #include "watchdog.h"
 #include "wdt.h"
+#include "queues.h"
+#include "task_handler.h"
 
 
 /***** SPI pins *****/
@@ -86,8 +88,10 @@ void command_task(void *pvParameters) {
 }
 
 int main(void) {
+    init_queues();
+    create_all_tasks();
 
-     if (MXC_WDT_GetResetFlag(MXC_WDT0)) {
+    if (MXC_WDT_GetResetFlag(MXC_WDT0)) {
         MXC_WDT_ClearResetFlag(MXC_WDT0);
     }
 
