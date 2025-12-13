@@ -1,6 +1,8 @@
+#include <stdint.h>
+
+#include "FreeRTOS.h"
 #include "queues.h"
 #include "typing.h"
-#include "FreeRTOS.h"
 
 // Initialize queues
 void init_queues(void) {
