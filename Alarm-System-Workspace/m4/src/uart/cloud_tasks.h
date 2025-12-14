@@ -1,7 +1,7 @@
 #ifndef CLOUD_TASKS_H
 #define CLOUD_TASKS_H
 
-#include "typing.h"
+#include "../utils/typing.h"
 
 /**
  * @brief UART RX callback - sends command to queue from ISR context

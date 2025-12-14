@@ -3,12 +3,12 @@
 #include "FreeRTOS.h"
 #include "task.h"
 
-#include "alarm/alert_outputs.h"
-#include "alert_control.h"
+#include "../alarm/alert_outputs.h"
+#include "../alarm/alert_control.h"
 #include "watchdog.h"
 #include "queues.h"
-#include "adxl343_motion.h"
-#include "cloud_tasks.h"
+#include "../motion/adxl343_motion.h"
+#include "../uart/cloud_tasks.h"
 
 void create_LED_control_task(void) {
     xTaskCreate(LedEffectTask, "LEDEffects", 512, NULL, 1,NULL);

@@ -20,8 +20,8 @@
 #include "task.h"
 #include "queue.h"
 #include "cloud_tasks.h"
-#include "typing.h"
-#include "queues.h"
+#include "../utils/typing.h"
+#include "../utils/queues.h"
 #include "uart_coms.h"
 #include "board.h"
 
