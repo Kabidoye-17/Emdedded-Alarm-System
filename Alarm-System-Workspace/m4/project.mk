@@ -42,5 +42,8 @@ PROJ_CFLAGS += -fdump-ipa-cgraph
 PROJ_CFLAGS += -fstack-usage
 PROJ_CFLAGS += -gdwarf-4
 
+FREERTOS_SRC += \
+    $(FREERTOS_DIR)/Source/timers.c
+
 # Use the generated linker file from the project
 LINKERFILE = memory.ld
