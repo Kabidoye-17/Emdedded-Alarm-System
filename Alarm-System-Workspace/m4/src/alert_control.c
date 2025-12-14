@@ -119,7 +119,6 @@ void AlertControlTask(void *arg){
                 update.from_motion = 1;
                 update.warning = m_e.warning;
                 update.state = new_state;
-                memcpy(update.timestamp, m_e.timestamp, MAX_TIMESTAMP_LENGTH);
                 send_cloud_update(&update);
             }
         }

@@ -3,8 +3,6 @@
 
 #include <stdint.h>
 
-#define MAX_TIMESTAMP_LENGTH 32
-
 // ===================== ENUMS =====================
 
 // -> received from motion sensor
@@ -36,7 +34,6 @@ typedef enum alarm_state {
 // -> motion_queue contents
 typedef struct motion_event {
     warn_type warning;
-    char timestamp[MAX_TIMESTAMP_LENGTH];
 } motion_event;
 
 // -> command_queue contents
@@ -49,7 +46,6 @@ typedef struct cloud_update_event {
     unsigned int from_motion : 1; // boolean bitfield
     warn_type warning; // null if !from_motion
     alarm_state state;
-    char timestamp[MAX_TIMESTAMP_LENGTH]; // null if !from_motion
 } cloud_update_event; 
 
 #endif /* TYPING_H */
