@@ -129,8 +129,7 @@ static void MotionDetectionTask(void *arg)
         }
 
         if (send)
-        {
-            printf("Motion event: %d\n", evt);  
+        { 
             xQueueSend(motionQueue, &evt, 0);
         }
 
