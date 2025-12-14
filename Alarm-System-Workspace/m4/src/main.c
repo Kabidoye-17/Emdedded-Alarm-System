@@ -32,35 +32,12 @@
 #include "wdt.h"
 #include "queues.h"
 #include "task_handler.h"
+#include "cloud_tasks.h"
 
 
 /***** SPI pins *****/
 #define MOSI_PIN 21
 #define MISO_PIN 22
-
-
-// UART callback - sends command to queue from ISR context
-void on_message_received(command_type cmd) {
-    command_event event;
-    event.cmd = cmd;
-
-    BaseType_t xHigherPriorityTaskWoken = pdFALSE;
-
-    // Attempt to send to queue
-    if (xQueueSendFromISR(command_queue, &event, &xHigherPriorityTaskWoken) != pdPASS) {
-        // Queue full - drop oldest command to make room
-        command_event discarded_event;
-        xQueueReceiveFromISR(command_queue, &discarded_event, &xHigherPriorityTaskWoken);
-
-        // Retry sending new command (should succeed now)
-        xQueueSendFromISR(command_queue, &event, &xHigherPriorityTaskWoken);
-    }
-
-    // Yield to higher priority task if necessary
-    portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
-}
-
-
 
 int main(void) {
     init_queues();

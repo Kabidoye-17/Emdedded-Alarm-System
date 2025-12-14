@@ -6,6 +6,9 @@
 
 #include "uart_coms.h"
 #include "crc.h"
+#include <stdio.h>
+#include "FreeRTOS.h"
+#include "task.h"
 
 #define BAUD_RATE 115200
 #define PROTOCOL_STX 0x02
@@ -171,4 +174,71 @@ void uart_init(uart_rxMessage_cbt uart_rxMessage_cb)
         while(1);  // Halt on error
     }
     MXC_UART_EnableInt(MXC_UART0, MXC_F_UART_INT_EN_RX_THD);
+}
+
+/**
+ * @brief Transmit single byte over UART0 with timeout detection
+ *
+ * @param byte Byte to transmit
+ * @param timeout_ms Timeout in milliseconds
+ * @return 0 on success, -1 on timeout (gateway offline)
+ */
+static int uart_txByte_with_timeout(uint8_t byte, uint32_t timeout_ms) {
+    TickType_t start_tick = xTaskGetTickCount();
+    TickType_t timeout_ticks = pdMS_TO_TICKS(timeout_ms);
+
+    while (MXC_UART_GetTXFIFOAvailable(MXC_UART0) == 0) {
+        // Check if timeout exceeded
+        if ((xTaskGetTickCount() - start_tick) >= timeout_ticks) {
+            return -1;  // Timeout - assume gateway offline
+        }
+
+        // Yield CPU to prevent busy-wait
+        vTaskDelay(1);
+    }
+
+    // FIFO space available - transmit byte
+    MXC_UART_WriteTXFIFO(MXC_UART0, &byte, 1);
+    return 0;
+}
+
+
+/**
+ * @brief Build and transmit framed message with timeout detection
+ *
+ * Frame format: [STX][length][data...][crc_low][crc_high][ETX]
+ *
+ * @param data Pointer to data buffer
+ * @param length Number of data bytes (1-MAX_DATA_LENGTH)
+ * @param timeout_ms Timeout for each byte transmission
+ * @return 0 on success, -1 on invalid length or timeout
+ */
+int uart_send_frame_with_timeout(const uint8_t* data, uint8_t length, uint32_t timeout_ms) {
+    if (length == 0 || length > MAX_DATA_LENGTH) {
+        return -1;  // Invalid length
+    }
+
+    // Calculate CRC over [length][data]
+    uint16_t crc = CRCINIT;
+    crc = crc_iterate(crc, length);
+    for (uint8_t i = 0; i < length; i++) {
+        crc = crc_iterate(crc, data[i]);
+    }
+
+    uint8_t crc_low = crc & 0xFF;
+    uint8_t crc_high = (crc >> 8) & 0xFF;
+
+    // Transmit frame with timeout checks
+    if (uart_txByte_with_timeout(PROTOCOL_STX, timeout_ms) != 0) return -1;
+    if (uart_txByte_with_timeout(length, timeout_ms) != 0) return -1;
+
+    for (uint8_t i = 0; i < length; i++) {
+        if (uart_txByte_with_timeout(data[i], timeout_ms) != 0) return -1;
+    }
+
+    if (uart_txByte_with_timeout(crc_low, timeout_ms) != 0) return -1;
+    if (uart_txByte_with_timeout(crc_high, timeout_ms) != 0) return -1;
+    if (uart_txByte_with_timeout(PROTOCOL_ETX, timeout_ms) != 0) return -1;
+
+    return 0;  // Success
 }

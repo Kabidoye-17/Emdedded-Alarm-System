@@ -65,8 +65,16 @@ static alarm_event command_to_alarm_event(command_type cmd) {
 }
 
 int send_cloud_update(cloud_update_event* update) {
-    int result = xQueueSend(cloud_update_queue, update, portMAX_DELAY);
-    return result;
+    // Try to send with timeout
+    if (xQueueSend(cloud_update_queue, update, pdMS_TO_TICKS(100)) != pdPASS) {
+        // Queue full - drop oldest message to make room
+        cloud_update_event discarded;
+        xQueueReceive(cloud_update_queue, &discarded, 0);
+
+        // Retry sending new update (should succeed now)
+        xQueueSend(cloud_update_queue, update, 0);
+    }
+    return pdPASS;
 }
 
 static void warn_timeout_callback(TimerHandle_t xTimer) {
