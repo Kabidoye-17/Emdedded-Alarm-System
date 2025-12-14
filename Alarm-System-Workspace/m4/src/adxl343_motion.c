@@ -215,7 +215,8 @@ static void MotionDetectionTask(void *arg)
         // Send event to queue if valid
         if (send)
         {
-            xQueueSend(motionQueue, &evt, 0);
+            motion_event motion = {evt};
+            xQueueSend(motionQueue, &motion, 0);
         }
     }
 }
