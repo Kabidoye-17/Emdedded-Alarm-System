@@ -159,12 +159,17 @@ VPATH += .
 VPATH += src
 VPATH := $(VPATH)
 VPATH += src/alarm
+VPATH += src/uart
+VPATH += src/utils
+VPATH += src/motion
 
 # Where to find header files for this project
 IPATH += .
 IPATH += include
 IPATH := $(IPATH)
 IPATH += src/alarm
+IPATH += src
+IPATH += src/utils
 
 AUTOSEARCH ?= 1
 ifeq ($(AUTOSEARCH), 1)
