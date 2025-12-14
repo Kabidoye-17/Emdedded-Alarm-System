@@ -7,12 +7,12 @@
     "password": null
   },
   "uart": {
-    "port": "COM12",
+    "port": "COM7",
     "baudrate": 115200
   },
   "topics": {
     "command": "topic/command_event",
-    "telemetry": "topic/telemetry"
+    "update": "topic/alarm_update"
   },
   "commands": {
     "valid_uart_commands": ["ARM", "DISARM", "RESOLVE"],

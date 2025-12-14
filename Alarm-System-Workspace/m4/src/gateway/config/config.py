@@ -20,6 +20,7 @@ class UARTConfig:
 @dataclass
 class TopicsConfig:
     command: str
+    update: str
 
 @dataclass
 class CommandsConfig:
