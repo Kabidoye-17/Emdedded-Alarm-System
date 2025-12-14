@@ -104,14 +104,6 @@ int main(void) {
         return retVal;
 
 
-
-    adxl343_motion_start(
-        motion_queue,
-        configMAX_PRIORITIES - 1,
-        512
-    );
-
-
     // Initialize UART
     uart_init(on_message_received);
 

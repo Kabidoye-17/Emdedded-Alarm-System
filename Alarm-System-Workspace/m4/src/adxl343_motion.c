@@ -8,6 +8,11 @@
 #include "FreeRTOS.h"
 #include "task.h"
 #include "semphr.h"
+#include "typing.h"
+
+#define ACTIVITY_COOLDOWN_MS 2000
+static TickType_t last_activity_tick = 0;
+
 
 /***** ADXL343 registers *****/
 #define ADXL343_THRESH_TAP     0x1D
@@ -103,7 +108,7 @@ static void MotionDetectionTask(void *arg)
         uint8_t flags = motion_flags;
         motion_flags = 0;
 
-        MotionEvent evt;
+        warn_type evt;
         uint8_t send = 1;
 
         /* Highest priority first */
@@ -111,18 +116,21 @@ static void MotionDetectionTask(void *arg)
         {
             evt = HIGH_WARN;
         }
-        else if (flags & ADXL343_INT_ACTIVITY)
+        else if (flags & ADXL343_INT_DOUBLE_TAP)
         {
             evt = MED_WARN;
         }
-        else if (flags & ADXL343_INT_DOUBLE_TAP)
+        else if (flags & ADXL343_INT_ACTIVITY)
         {
-            evt = LOW_WARN;
+            // avoid repeated activity events in short time so queue isn't flooded
+            TickType_t now = xTaskGetTickCount();
+            if ((now - last_activity_tick) > pdMS_TO_TICKS(ACTIVITY_COOLDOWN_MS)) {
+                evt = LOW_WARN;
+                last_activity_tick = now;
+            } else {
+                send = 0;
+            }
         }
-        // else if (flags & ADXL343_INT_INACTIVITY)
-        // {
-        //     evt = SAFE;
-        // }
         else
         {
             send = 0;
@@ -147,16 +155,16 @@ int adxl343_motion_start(QueueHandle_t q,
         return -1;
 
     /* Sensor config */
-    adxl343_write_reg(ADXL343_THRESH_TAP, 45);   // ~2.8 g
-    adxl343_write_reg(ADXL343_DUR,        15);   // ~9 ms
-    adxl343_write_reg(ADXL343_LATENT,     30);   // ~30 ms
-    adxl343_write_reg(ADXL343_WINDOW,     60);   // ~60 ms
+    adxl343_write_reg(ADXL343_THRESH_TAP,   30);
+    adxl343_write_reg(ADXL343_DUR,          20);
+    adxl343_write_reg(ADXL343_LATENT,       40);
+    adxl343_write_reg(ADXL343_WINDOW,      100);
     adxl343_write_reg(ADXL343_TAP_AXES,   0x07); // XYZ
 
 
-    adxl343_write_reg(ADXL343_THRESH_ACT, 40); 
-    adxl343_write_reg(ADXL343_THRESH_INACT, 15);
-    adxl343_write_reg(ADXL343_TIME_INACT, 50);
+    adxl343_write_reg(ADXL343_THRESH_ACT,   60);
+    adxl343_write_reg(ADXL343_THRESH_INACT, 20);
+    adxl343_write_reg(ADXL343_TIME_INACT,   50);
     adxl343_write_reg(ADXL343_ACT_INACT_CTL, 0x70); 
 
     adxl343_write_reg(ADXL343_THRESH_FF, 9);
