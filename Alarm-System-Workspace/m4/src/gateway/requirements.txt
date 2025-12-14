@@ -1,0 +1,11 @@
+# MQTT Gateway Requirements
+# Python 3.8+
+
+# MQTT client library
+paho-mqtt==1.6.1
+
+# Serial communication
+pyserial==3.5
+
+# Environment variable management (optional, for .env files)
+python-dotenv==1.0.0
