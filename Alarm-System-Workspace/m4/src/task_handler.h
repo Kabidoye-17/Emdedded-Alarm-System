@@ -4,6 +4,7 @@
 
 void create_LED_control_task(void);
 void create_alert_control_task(void);
+void create_watchdog_task(void);
 void create_all_tasks(void);
 
 // TODO: Add cloud tasks and motion sensor tasks

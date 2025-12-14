@@ -55,6 +55,9 @@
 #define configUSE_CO_ROUTINES 0
 #define configUSE_16_BIT_TICKS 0
 #define configUSE_MUTEXES 1
+#define configUSE_COUNTING_SEMAPHORES 1
+#define configUSE_QUEUE_SETS 1
+
 
 /* Run time and task stats gathering related definitions. */
 #define configUSE_TRACE_FACILITY 1
