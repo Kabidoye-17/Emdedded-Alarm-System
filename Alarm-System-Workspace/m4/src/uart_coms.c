@@ -51,7 +51,7 @@ static command_type parse_command(const uint8_t* data, uint8_t length)
     } else if (strcmp(cmd_str, "DISARM") == 0) {
         return DISARM;
     } else if (strcmp(cmd_str, "RESOLVE") == 0) {
-        return RESOLVE;
+        return RESOLVE_ALARM;
     }
 
     return UNKNOWN_COMMAND;

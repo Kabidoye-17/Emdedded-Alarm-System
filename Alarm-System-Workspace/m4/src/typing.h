@@ -17,7 +17,7 @@ typedef enum command_type {
     ARM,
     DISARM,
     RESOLVE_ALARM,
-    CANCEL_WARN
+    UNKNOWN_COMMAND
 } command_type;
 
 // -> actual states of the alarm system
