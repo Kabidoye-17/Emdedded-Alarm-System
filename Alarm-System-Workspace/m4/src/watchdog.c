@@ -23,20 +23,6 @@ void watchdog_init(void)
 
 }
 
-
-static void watchdog_enable_and_start(void)
-{
-    MXC_WDT_ResetTimer(MXC_WDT0);
-    MXC_WDT_EnableReset(MXC_WDT0);
-    MXC_WDT_Enable(MXC_WDT0);
-}
-
-void watchdog_kick(void)
-{
-    MXC_WDT_ResetTimer(MXC_WDT0);
-}
-
-
 void WatchdogTask(void *pvParameters)
 {
     /* Let system settle and clear lower window */

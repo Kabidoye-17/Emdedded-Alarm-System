@@ -10,7 +10,7 @@
 
 #define SPI MXC_SPI1
 
-// ADXL343 register map (see adxl343.pdf)
+// ADXL343 register map (see adxl343 datasheet)
 #define ADXL343_REG_DEVID 0x00
 #define ADXL343_REG_BW_RATE 0x2C
 #define ADXL343_REG_POWER_CTL 0x2D
@@ -27,7 +27,6 @@
 #define ADXL343_SPI_MB 0x40
 #define ADXL343_SPI_SS_INDEX 1 // Use SS1 on the Feather header by default
 #define ADXL343_SPI_MAX_TRANSFER 8 // Command byte + 6 data bytes, rounded up
-
 
 int adxl343_spi_init(const mxc_spi_pins_t *pins);
 int adxl343_probe(void);
