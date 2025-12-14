@@ -6,10 +6,12 @@
 #include "queue.h"
 
 
-/* Initializes sensor + GPIO + starts motion task */
-int adxl343_motion_start(QueueHandle_t motionQueue,
-                         UBaseType_t priority,
-                         uint16_t stackDepth);
-
+/***** Motion detection task *****/
+/*
+ * This task waits for motion interrupts signaled by the ISR.
+ * It prioritizes events and sends the highest-priority warning
+ * to the motion queue.
+ */
+void MotionDetectionTask(void *arg);
 
 #endif
