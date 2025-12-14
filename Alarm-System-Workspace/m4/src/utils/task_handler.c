@@ -6,7 +6,6 @@
 #include "../alarm/alert_outputs.h"
 #include "../alarm/alert_control.h"
 #include "watchdog.h"
-#include "queues.h"
 #include "../motion/adxl343_motion.h"
 #include "../uart/cloud_tasks.h"
 
@@ -24,7 +23,7 @@ void create_watchdog_task(void) {
 }
 
 void create_motion_detection_task(void) {
-    adxl343_motion_start( motion_queue, configMAX_PRIORITIES - 1, 512);
+    xTaskCreate(MotionDetectionTask, "MotionDetect", 512, NULL, configMAX_PRIORITIES - 1, NULL);
 }
 
 void create_cloud_send_task(void) {

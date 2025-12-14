@@ -87,6 +87,8 @@ void AlertControlTask(void *arg){
     static alarm_sm alarm_machine;
     alarm_sm_init(&alarm_machine);
     init_GPIO_for_LEDs();
+    // Activate start state outputs
+    apply_alerts(alarm_machine.state);
 
     alert_queue_set = xQueueCreateSet(SET_LENGTH);
 

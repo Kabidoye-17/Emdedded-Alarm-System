@@ -8,6 +8,7 @@
 #include "task.h"
 #include "semphr.h"
 #include "../utils/typing.h"
+#include "queues.h"
 
 /*
  * This module handles motion detection using the ADXL343 accelerometer.
@@ -74,7 +75,6 @@ static TickType_t last_activity_tick = 0;
  * motionQueue -> queue used to send motion warning events to the system
  */
 static SemaphoreHandle_t motionSem;
-static QueueHandle_t motionQueue;
 
 
 /* ---------- Module state ---------- */
@@ -157,6 +157,64 @@ static void setup_gpio_interrupt(void)
     NVIC_EnableIRQ(GPIO1_IRQn);
 }
 
+/*
+ * Initializes motion detection:
+ *  - stores caller-provided queue
+ *  - configures ADXL343 thresholds and interrupts
+ *  - sets up GPIO interrupt
+ *  - starts motion detection task
+ */
+int adxl343_motion_start(void)
+{
+    // Create binary semaphore for ISR-to-task signaling
+    motionSem = xSemaphoreCreateBinary();
+    if (!motionSem)
+        return -1;
+
+    /* ---------- Sensor configuration ---------- */
+
+    // Tap detection configuration
+    adxl343_write_reg(ADXL343_THRESH_TAP,   30);
+    adxl343_write_reg(ADXL343_DUR,          20);
+    adxl343_write_reg(ADXL343_LATENT,       40);
+    adxl343_write_reg(ADXL343_WINDOW,      100);
+    adxl343_write_reg(ADXL343_TAP_AXES,   0x07); // Enable X, Y, Z axes
+
+    // Activity / inactivity configuration
+    adxl343_write_reg(ADXL343_THRESH_ACT,   60);
+    adxl343_write_reg(ADXL343_THRESH_INACT, 20);
+    adxl343_write_reg(ADXL343_TIME_INACT,   50);
+    adxl343_write_reg(ADXL343_ACT_INACT_CTL, 0x70);
+
+    // Free-fall detection configuration
+    adxl343_write_reg(ADXL343_THRESH_FF, 9);
+    adxl343_write_reg(ADXL343_TIME_FF,  20);
+
+    // Route all interrupts to INT1 pin
+    adxl343_write_reg(ADXL343_INT_MAP, 0x00);
+
+    // Enable desired interrupt sources
+    adxl343_write_reg(
+        ADXL343_INT_ENABLE,
+        ADXL343_INT_DOUBLE_TAP |
+        ADXL343_INT_ACTIVITY   |
+        ADXL343_INT_INACTIVITY |
+        ADXL343_INT_FREE_FALL
+    );
+
+    // Clear any latched interrupts
+    uint8_t dummy;
+    adxl343_read_regs(ADXL343_INT_SOURCE, &dummy, 1);
+
+    // Configure GPIO interrupt for ADXL343 INT pin
+    setup_gpio_interrupt();
+    MXC_GPIO_ClearFlags(ADXL343_INT_PORT,
+                        (1 << ADXL343_INT_PIN));
+
+    // Successfully configured motion detection
+    return 0;
+}
+
 
 /***** Motion detection task *****/
 /*
@@ -164,9 +222,11 @@ static void setup_gpio_interrupt(void)
  * It prioritizes events and sends the highest-priority warning
  * to the motion queue.
  */
-static void MotionDetectionTask(void *arg)
+void MotionDetectionTask(void *arg)
 {
     (void)arg;
+    // Start motion detection
+    adxl343_motion_start();
 
     for (;;)
     {
@@ -216,79 +276,7 @@ static void MotionDetectionTask(void *arg)
         if (send)
         {
             motion_event motion = {evt};
-            xQueueSend(motionQueue, &motion, 0);
+            xQueueSend(motion_queue, &motion, 0);
         }
     }
-}
-
-
-/***** Public API *****/
-/*
- * Initializes motion detection:
- *  - stores caller-provided queue
- *  - configures ADXL343 thresholds and interrupts
- *  - sets up GPIO interrupt
- *  - starts motion detection task
- */
-int adxl343_motion_start(QueueHandle_t q,
-                         UBaseType_t priority,
-                         uint16_t stackDepth)
-{
-    // Store queue for motion events
-    motionQueue = q;
-
-    // Create binary semaphore for ISR-to-task signaling
-    motionSem = xSemaphoreCreateBinary();
-    if (!motionSem)
-        return -1;
-
-    /* ---------- Sensor configuration ---------- */
-
-    // Tap detection configuration
-    adxl343_write_reg(ADXL343_THRESH_TAP,   30);
-    adxl343_write_reg(ADXL343_DUR,          20);
-    adxl343_write_reg(ADXL343_LATENT,       40);
-    adxl343_write_reg(ADXL343_WINDOW,      100);
-    adxl343_write_reg(ADXL343_TAP_AXES,   0x07); // Enable X, Y, Z axes
-
-    // Activity / inactivity configuration
-    adxl343_write_reg(ADXL343_THRESH_ACT,   60);
-    adxl343_write_reg(ADXL343_THRESH_INACT, 20);
-    adxl343_write_reg(ADXL343_TIME_INACT,   50);
-    adxl343_write_reg(ADXL343_ACT_INACT_CTL, 0x70);
-
-    // Free-fall detection configuration
-    adxl343_write_reg(ADXL343_THRESH_FF, 9);
-    adxl343_write_reg(ADXL343_TIME_FF,  20);
-
-    // Route all interrupts to INT1 pin
-    adxl343_write_reg(ADXL343_INT_MAP, 0x00);
-
-    // Enable desired interrupt sources
-    adxl343_write_reg(
-        ADXL343_INT_ENABLE,
-        ADXL343_INT_DOUBLE_TAP |
-        ADXL343_INT_ACTIVITY   |
-        ADXL343_INT_INACTIVITY |
-        ADXL343_INT_FREE_FALL
-    );
-
-    // Clear any latched interrupts
-    uint8_t dummy;
-    adxl343_read_regs(ADXL343_INT_SOURCE, &dummy, 1);
-
-    // Configure GPIO interrupt for ADXL343 INT pin
-    setup_gpio_interrupt();
-    MXC_GPIO_ClearFlags(ADXL343_INT_PORT,
-                        (1 << ADXL343_INT_PIN));
-
-    // Create motion detection task
-    return xTaskCreate(
-        MotionDetectionTask,
-        "MotionDetect",
-        stackDepth,
-        NULL,
-        priority,
-        NULL
-    ) == pdPASS ? 0 : -2;
 }
