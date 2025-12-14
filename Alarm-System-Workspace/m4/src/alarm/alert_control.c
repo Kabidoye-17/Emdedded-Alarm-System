@@ -2,10 +2,10 @@
 #include "FreeRTOS.h"
 #include "task.h"
 #include "timers.h"
-#include "alarm/state_machine.h"
-#include "alarm/alert_outputs.h"
-#include "alarm/led_driver.h"
-#include "queues.h"
+#include "state_machine.h"
+#include "alert_outputs.h"
+#include "led_driver.h"
+#include "../utils/queues.h"
 
 QueueSetHandle_t alert_queue_set;
 #define SET_LENGTH (MOTION_QUEUE_LENGTH + COMMAND_QUEUE_LENGTH)

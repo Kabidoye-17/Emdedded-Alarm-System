@@ -2,7 +2,7 @@
 #define STATE_MACHINE_H
 
 #include <stdint.h>
-#include "../typing.h"
+#include "../utils/typing.h"
 
 /*
  * Alarm system state machine.

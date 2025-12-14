@@ -7,7 +7,7 @@
 #include "FreeRTOS.h"
 #include "task.h"
 #include "semphr.h"
-#include "typing.h"
+#include "../utils/typing.h"
 
 /*
  * This module handles motion detection using the ADXL343 accelerometer.
