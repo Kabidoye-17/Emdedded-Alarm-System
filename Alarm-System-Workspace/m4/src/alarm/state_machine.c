@@ -2,7 +2,8 @@
 
 static alarm_state transition(alarm_state state, alarm_event event) {
 	switch (event) {
-	case EVENT_DISARM_SYSTEM:
+	// Disarm always works from any state
+		case EVENT_DISARM_SYSTEM:
 		return DISARMED;
 	default:
 		break;
@@ -51,6 +52,7 @@ void alarm_sm_init(alarm_sm *sm) {
 	sm->state = DISARMED;
 }
 
+// Calls private transition function and updates state
 void alarm_sm_handle_event(alarm_sm *sm, alarm_event event) {
 	if (!sm)
 		return;
@@ -58,6 +60,7 @@ void alarm_sm_handle_event(alarm_sm *sm, alarm_event event) {
 	sm->state = transition(sm->state, event);
 }
 
+// Getter for current state
 alarm_state alarm_sm_state(const alarm_sm *sm) {
 	if (!sm)
 		return DISARMED;
@@ -65,6 +68,7 @@ alarm_state alarm_sm_state(const alarm_sm *sm) {
 	return sm->state;
 }
 
+// Get string name of the given state
 const char *alarm_state_name(alarm_state state) {
 	switch (state) {
 	case DISARMED:

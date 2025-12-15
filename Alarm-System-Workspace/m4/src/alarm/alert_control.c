@@ -36,6 +36,7 @@ static void apply_alerts(alarm_state state) {
 	}
 }
 
+// Enum/event conversion helper
 static alarm_event warn_to_alarm_event(warn_type warning) {
     switch (warning) {
         case LOW_WARN:
@@ -49,6 +50,7 @@ static alarm_event warn_to_alarm_event(warn_type warning) {
     }
 }
 
+// Enum/event conversion helper
 static alarm_event command_to_alarm_event(command_type cmd) {
     switch (cmd) {
         case ARM:
@@ -64,6 +66,7 @@ static alarm_event command_to_alarm_event(command_type cmd) {
     }
 }
 
+// Send update to cloud_update_queue, dropping oldest if queue full
 int send_cloud_update(cloud_update_event* update) {
     // Try to send with timeout
     if (xQueueSend(cloud_update_queue, update, pdMS_TO_TICKS(100)) != pdPASS) {
@@ -77,6 +80,7 @@ int send_cloud_update(cloud_update_event* update) {
     return pdPASS;
 }
 
+// Callback - sends CANCEL_WARN command_event
 static void warn_timeout_callback(TimerHandle_t xTimer) {
     command_event cancel_cmd = {.cmd = CANCEL_WARN};
     xQueueSend(command_queue, &cancel_cmd, 0);
@@ -90,8 +94,10 @@ void AlertControlTask(void *arg){
     // Activate start state outputs
     apply_alerts(alarm_machine.state);
 
-    alert_queue_set = xQueueCreateSet(SET_LENGTH);
+    // Create queue set for motion and command queues
+    // Receives from both queues and processes whichever has data
 
+    alert_queue_set = xQueueCreateSet(SET_LENGTH);
     xQueueAddToSet(motion_queue, alert_queue_set);
     xQueueAddToSet(command_queue, alert_queue_set);
     

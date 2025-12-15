@@ -43,11 +43,14 @@ void turn_off_red_LED(void) {
     LED_Off(red_idx);
 }
 
+// Set red LED brightness using software PWM (0-100%)
 void set_red_LED_brightness(uint8_t duty_percent) {
     if (duty_percent > 100) duty_percent = 100;
     red_duty_percent = duty_percent;
 
-    // Simple on/off based on 100-step software PWM
+    // 100-step software PWM: advance a 0–99 counter each call.
+    // LED is ON while counter < duty_percent, OFF otherwise.
+    // Perceived brightness comes from time-averaged on-time; no busy-wait
     static uint8_t pwm_counter = 0;
     pwm_counter = (pwm_counter + 1) % 100;
 

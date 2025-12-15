@@ -6,7 +6,7 @@
 
 /*
  * Alarm system state machine.
- * Transitions occur through events such as arm/disarm and warn levels.
+ * Transitions occur through events such as arm/disarm (command_events) and warn levels (motion_events).
  */
 
 // State change triggers
@@ -17,7 +17,7 @@ typedef enum alarm_event {
 	EVENT_MED_WARN,
 	EVENT_HIGH_WARN,
 	EVENT_RESOLVE_ALARM,
-	EVENT_CANCEL_WARN // Produced when timeouts occurs
+	EVENT_CANCEL_WARN // Produced when low warn timeout occurs
 } alarm_event;
 
 // State machine structure (Just a container for current state)
