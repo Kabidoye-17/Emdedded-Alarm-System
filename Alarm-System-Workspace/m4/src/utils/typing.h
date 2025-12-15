@@ -3,6 +3,8 @@
 
 #include <stdint.h>
 
+// Used for defining enums and structs for inter-task communication via FreeRTOS queues.
+
 // ===================== ENUMS =====================
 
 // -> received from motion sensor
