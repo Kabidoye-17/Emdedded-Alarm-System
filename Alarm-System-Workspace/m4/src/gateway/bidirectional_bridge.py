@@ -27,8 +27,8 @@ class BidirectionalBridge:
         # MQTT publisher for telemetry (new)
         self.mqtt_publisher = MQTTPublisher()
 
-        # Frame parser for incoming UART data
-        self.frame_parser = UARTFrameParser(self.on_update_frame_received)
+        # Frame parser for incoming UART data (pass serial port for ACK)
+        self.frame_parser = UARTFrameParser(self.on_update_frame_received, self.uart.ser)
 
         # Thread for UART RX
         self.uart_rx_thread = None

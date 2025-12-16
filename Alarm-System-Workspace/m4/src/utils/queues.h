@@ -5,7 +5,7 @@
 
 #define MOTION_QUEUE_LENGTH 10
 #define COMMAND_QUEUE_LENGTH 10
-#define CLOUD_QUEUE_LENGTH 10
+#define CLOUD_QUEUE_LENGTH 20
 
 // motion_events sent from motion task -> handled by alert controller task, state updated as needed
 extern QueueHandle_t motion_queue;

@@ -15,6 +15,14 @@
 void on_message_received(command_type cmd);
 
 /**
+ * @brief UART RX callback - signals ACK reception from ISR context
+ *
+ * Called by UART ISR when ACK byte (0xAA) received from gateway.
+ * Signals cloud_send_task that message was acknowledged.
+ */
+void on_ack_received(void);
+
+/**
  * @brief Cloud send task - consumes cloud_update_queue and transmits via UART
  *
  * Monitors cloud_update_queue for events from AlertControlTask, serializes

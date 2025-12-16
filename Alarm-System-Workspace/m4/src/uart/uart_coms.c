@@ -9,10 +9,12 @@
 #include <stdio.h>
 #include "FreeRTOS.h"
 #include "task.h"
+#include "cloud_tasks.h"
 
 #define BAUD_RATE 115200
 #define PROTOCOL_STX 0x02
 #define PROTOCOL_ETX 0x03
+#define ACK_BYTE 0xAA
 #define MAX_DATA_LENGTH 16
 
 typedef enum {
@@ -89,7 +91,11 @@ void UART0_Handler(void)
                     uart_vars.state = STATE_READ_LENGTH;
                     uart_vars.calculated_crc = CRCINIT;
                     memset(uart_vars.data_buffer, 0, MAX_DATA_LENGTH);
+                } else if (byte == ACK_BYTE) {
+                    // ACK byte received from gateway - signal cloud_send_task
+                    on_ack_received();
                 }
+                // Otherwise ignore byte and stay in WAIT_STX
                 break;
 
             case STATE_READ_LENGTH:

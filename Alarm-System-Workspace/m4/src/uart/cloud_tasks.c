@@ -19,17 +19,24 @@
 #include "FreeRTOS.h"
 #include "task.h"
 #include "queue.h"
+#include "semphr.h"
 #include "cloud_tasks.h"
 #include "../utils/typing.h"
 #include "../utils/queues.h"
 #include "uart_coms.h"
 #include "board.h"
+#include "mxc_device.h"
+#include "uart.h"
 
 // Configuration constants
 #define TX_TIMEOUT_MS 100
-#define OFFLINE_THRESHOLD 3
+#define ACK_TIMEOUT_MS 200
+#define ACK_BYTE 0xAA
 #define INTER_MESSAGE_DELAY_MS 50
 #define RETRY_BACKOFF_MS 500
+
+// Binary semaphore for ACK reception (signaled by UART ISR)
+static SemaphoreHandle_t ack_semaphore = NULL;
 
 /**
  * @brief UART RX callback - sends command to queue from ISR context
@@ -120,30 +127,54 @@ static int serialize_cloud_update(const cloud_update_event* update,
 }
 
 /**
+ * @brief Called by UART ISR when ACK byte (0xAA) is received
+ */
+void on_ack_received(void) {
+    BaseType_t xHigherPriorityTaskWoken = pdFALSE;
+    xSemaphoreGiveFromISR(ack_semaphore, &xHigherPriorityTaskWoken);
+    portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
+}
+
+/**
+ * @brief Wait for ACK byte from gateway with timeout
+ * @return true if ACK received, false if timeout
+ */
+static bool wait_for_ack(uint32_t timeout_ms) {
+    // Clear any stale ACKs first
+    xSemaphoreTake(ack_semaphore, 0);
+
+    // Wait for ACK with timeout
+    return xSemaphoreTake(ack_semaphore, pdMS_TO_TICKS(timeout_ms)) == pdPASS;
+}
+
+/**
  * @brief Cloud send task - processes cloud_update_queue and handles transmission
  *
- * Dequeues cloud update events and transmits them via UART with timeout detection.
- * Implements retry logic and connection status tracking:
- * - ONLINE: Queue drains immediately, messages sent in real-time
- * - OFFLINE: Retries failed messages, accumulates queue
- * - RECOVERY: Drains queue when gateway returns online
+ * Transmits cloud update events via UART with ACK-based confirmation.
+ * Implements retry logic with automatic reconnection:
+ * - Messages remain in queue until ACK received
+ * - Retries failed messages with backoff
+ * - Automatically drains queue when gateway reconnects
  *
  */
 void cloud_send_task(void *pvParameters) {
     cloud_update_event update;
     char buffer[16 + 1];  // MAX_DATA_LENGTH + null terminator
-    uint8_t failure_count = 0;
-    bool is_online = true;
+
+    // Create ACK semaphore
+    ack_semaphore = xSemaphoreCreateBinary();
 
     while (1) {
-        // Wait for cloud update with timeout
-        if (xQueueReceive(cloud_update_queue, &update, pdMS_TO_TICKS(100)) == pdPASS) {
+        // Check if we have messages to send
+        if (xQueuePeek(cloud_update_queue, &update, pdMS_TO_TICKS(100)) == pdPASS) {
 
             // Serialize to pipe-delimited format
             int len = serialize_cloud_update(&update, buffer, sizeof(buffer));
 
             if (len < 0) {
-                continue;  // Discard and move to next message
+                // Serialization failed - discard this message
+                xQueueReceive(cloud_update_queue, &update, 0);
+                continue;
             }
 
             // Attempt transmission with timeout
@@ -153,32 +184,22 @@ void cloud_send_task(void *pvParameters) {
                 TX_TIMEOUT_MS
             );
 
-            if (result == 0) {
-                // SUCCESS - transmission completed
-                failure_count = 0;
+            if (result != 0) {
+                // TX failed (FIFO full) - gateway offline, retry
+                vTaskDelay(pdMS_TO_TICKS(RETRY_BACKOFF_MS));
+                continue;
+            }
 
-                // Check if recovering from offline state
-                if (!is_online) {
-                           (int)uxQueueMessagesWaiting(cloud_update_queue);
-                    is_online = true;
-                }
+            // TX succeeded - now wait for ACK from gateway
+            if (wait_for_ack(ACK_TIMEOUT_MS)) {
+                // ACK received - message confirmed delivered
+                xQueueReceive(cloud_update_queue, &update, 0);
 
                 // Inter-message delay to avoid overwhelming gateway during queue drain
                 vTaskDelay(pdMS_TO_TICKS(INTER_MESSAGE_DELAY_MS));
 
             } else {
-                // FAILURE - transmission timed out
-                failure_count++;
-
-                // Check if gateway went offline
-                if (failure_count >= OFFLINE_THRESHOLD && is_online) {
-                    is_online = false;
-                }
-
-                // Re-queue message at front for retry (preserves FIFO order)
-                xQueueSendToFront(cloud_update_queue, &update, 0);
-
-                // Backoff delay before retry to avoid busy-wait
+                // No ACK - gateway offline, retry after backoff
                 vTaskDelay(pdMS_TO_TICKS(RETRY_BACKOFF_MS));
             }
         }
