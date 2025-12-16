@@ -31,6 +31,7 @@ class CommandsConfig:
 class ProtocolConfig:
     stx: int
     etx: int
+    ack: int
     max_data_length: int
     encoding: str
 

@@ -7,7 +7,7 @@
     "password": null
   },
   "uart": {
-    "port": "COM7",
+    "port": "COM12",
     "baudrate": 115200
   },
   "topics": {
@@ -21,6 +21,7 @@
   "protocol": {
     "stx": 2,
     "etx": 3,
+    "ack": 170,
     "max_data_length": 16,
     "encoding": "ascii"
   }

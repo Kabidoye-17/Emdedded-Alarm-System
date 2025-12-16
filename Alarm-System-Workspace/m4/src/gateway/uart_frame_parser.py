@@ -23,14 +23,16 @@ class UARTFrameParser:
     STATE_READ_CRC_HIGH = 4
     STATE_WAIT_ETX = 5
 
-    def __init__(self, on_frame_received):
+    def __init__(self, on_frame_received, serial_port=None):
         """
         Initialize parser.
 
         Args:
             on_frame_received: Callback function(data: bytes) called when valid frame received
+            serial_port: Serial port object for sending ACK (optional)
         """
         self.on_frame_received = on_frame_received
+        self.serial_port = serial_port
         self.state = self.STATE_WAIT_STX
         self.data_buffer = bytearray()
         self.data_length = 0
@@ -77,5 +79,16 @@ class UARTFrameParser:
                     # Valid frame - invoke callback
                     self.on_frame_received(bytes(self.data_buffer))
 
+                    # Send ACK byte back to board
+                    self.send_ack()
+
             # Always reset to wait for next frame
             self.state = self.STATE_WAIT_STX
+
+    def send_ack(self):
+        """Send ACK byte back to board"""
+        if self.serial_port:
+            try:
+                self.serial_port.write(bytes([protocol_config.ack]))
+            except Exception as e:
+                print(f"ERROR: Failed to send ACK: {e}")
