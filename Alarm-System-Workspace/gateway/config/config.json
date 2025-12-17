@@ -7,7 +7,6 @@
     "password": null
   },
   "uart": {
-    "port": "COM12",
     "baudrate": 115200
   },
   "topics": {

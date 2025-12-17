@@ -1,14 +1,16 @@
 """
 CRC-16 Module
 
-This module provides CRC-16 calculation using the same algorithm as the firmware.
-The lookup table and algorithm match the implementation in crc.c/crc.h.
+Provides utilities to compute and verify CRC-16 checksums used by the UART gateway.
 """
+# ...existing code...
 
 class CRC16:
-    """CRC-16 calculator matching firmware implementation"""
+    """CRC-16 calculator"""
 
-    # CRC-16 lookup table (matches C implementation from crc.h)
+    # Lookup table of 256 pre-computed CRC values for the chosen polynomial,
+    # enabling fast byte-wise checksum calculation by eliminating repeated math.
+    
     TABLE = [
         0x0000, 0x1189, 0x2312, 0x329b, 0x4624, 0x57ad, 0x6536, 0x74bf,
         0x8c48, 0x9dc1, 0xaf5a, 0xbed3, 0xca6c, 0xdbe5, 0xe97e, 0xf8f7,
@@ -44,14 +46,19 @@ class CRC16:
         0x7bc7, 0x6a4e, 0x58d5, 0x495c, 0x3de3, 0x2c6a, 0x1ef1, 0x0f78
     ]
 
-    # CRC constants (matching crc.h)
-    INIT = 0xFFFF
-    GOOD = 0xF0B8
+  
+    INIT = 0xFFFF  # Initial CRC value used at the start of calculation
 
     @classmethod
     def calculate(cls, data):
         """
-        Calculate CRC-16 using the same algorithm as firmware.
+        Calculate CRC-16 using table-driven algorithm.
+
+        For each byte: XOR the low byte of the CRC with the input byte to get
+        a table index, then shift the CRC right by 8 bits (moving the high byte
+        to the low byte position) and XOR with the pre-computed table value at
+        that index. This implements a fast byte-wise CRC computation using a
+        256-entry lookup table.
 
         Args:
             data: bytes object containing data to checksum
@@ -63,18 +70,3 @@ class CRC16:
         for byte in data:
             crc = (crc >> 8) ^ cls.TABLE[(crc ^ byte) & 0xFF]
         return crc
-
-    @classmethod
-    def verify(cls, data, received_crc):
-        """
-        Verify received CRC matches calculated CRC.
-
-        Args:
-            data: bytes object containing data
-            received_crc: 16-bit CRC value received
-
-        Returns:
-            True if CRC is valid, False otherwise
-        """
-        calculated_crc = cls.calculate(data)
-        return calculated_crc == received_crc

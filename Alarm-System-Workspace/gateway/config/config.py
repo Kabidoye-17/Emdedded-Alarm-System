@@ -14,7 +14,6 @@ class MQTTConfig:
 
 @dataclass
 class UARTConfig:
-    port: str
     baudrate: int
 
 @dataclass

@@ -1,5 +1,5 @@
 """
-Bidirectional MQTT-UART Bridge
+MQTT-UART Gateway
 
 Handles both command transmission (MQTT → UART) and telemetry reception (UART → MQTT).
 """
@@ -7,15 +7,16 @@ Handles both command transmission (MQTT → UART) and telemetry reception (UART 
 import json
 import threading
 from datetime import datetime, timezone
-from mqtt_subscriber import MQTTSubscriber
-from mqtt_publisher import MQTTPublisher
-from uart_bridge import UARTBridge
-from uart_frame_parser import UARTFrameParser
+from mqtt.mqtt_subscriber import MQTTSubscriber
+from mqtt.mqtt_publisher import MQTTPublisher
+from uart.uart_bridge import UARTBridge
+from uart.uart_frame_parser import UARTFrameParser
 from config.config import topics, commands, protocol as protocol_config
 import time
+import serial
 
-class BidirectionalBridge:
-    """Bidirectional MQTT-UART bridge for commands and telemetry"""
+class MQTTUARTGateway:
+    """Gateway bridging MQTT (cloud) and UART (embedded device) for commands and telemetry"""
 
     def __init__(self):
         # Single UART instance for both TX and RX
@@ -49,7 +50,7 @@ class BidirectionalBridge:
             print(f"ERROR: Failed to parse MQTT payload: {e}")
 
     def on_update_frame_received(self, data):
-        """Handle valid telemetry frame from board"""
+        """Handle valid update frame from board"""
         try:
             # Decode pipe-delimited string from board
             # Format: FROM_MOTION|WARN_TYPE|ALARM_STATE
@@ -66,7 +67,7 @@ class BidirectionalBridge:
             warn_type = parts[1] if parts[1] else None  # Empty string -> None for command events
             alarm_state = parts[2]
 
-            # Build telemetry object
+            # Build update object
             update = {
                 "from_motion": from_motion,
                 "alarm_state": alarm_state,
@@ -81,19 +82,47 @@ class BidirectionalBridge:
             print(f"ERROR: Failed to parse cloud update data: {e}")
 
     def uart_rx_loop(self):
-        """Thread loop for reading UART RX bytes"""
+        """Thread loop with automatic reconnection on disconnect"""
         print("UART RX thread started")
+        retry_delay = 1.0  # Initial retry delay in seconds
+        max_retry_delay = 5.0  # Cap retry delay at 5 seconds
+
         while self.running:
             try:
-                # Use the same serial port for reading
+                # Check connection state before attempting read
+                if not self.uart.is_connected():
+                    print(f"UART disconnected. Reconnecting in {retry_delay:.1f}s...")
+                    time.sleep(retry_delay)
+
+                    if self.uart.reconnect():
+                        print("✓ UART reconnected successfully")
+                        retry_delay = 1.0  # Reset backoff on success
+                        # Update frame parser's serial port reference
+                        self.frame_parser.serial_port = self.uart.ser
+                    else:
+                        # Exponential backoff (double delay up to max)
+                        retry_delay = min(retry_delay * 2, max_retry_delay)
+                    continue
+
+                # Normal read operation
                 if self.uart.ser.in_waiting > 0:
                     byte = self.uart.ser.read(1)[0]
                     self.frame_parser.process_byte(byte)
+                    retry_delay = 1.0  # Reset backoff on successful read
                 else:
                     # Small sleep to prevent busy-waiting
                     time.sleep(0.001)
+
+            except (serial.SerialException, OSError, PermissionError) as e:
+                # Port became invalid (ClearCommError, device unplugged, etc.)
+                print(f"✗ UART error (will reconnect): {type(e).__name__}")
+                self.uart.disconnect()
+                # Will attempt reconnection on next iteration
+
             except Exception as e:
-                print(f"ERROR in UART RX loop: {e}")
+                # Unexpected error - log but don't assume disconnect
+                print(f"⚠ Unexpected error in UART RX loop: {e}")
+                time.sleep(0.1)
 
     def start(self):
         """Start the bidirectional bridge"""
@@ -110,7 +139,7 @@ class BidirectionalBridge:
             self.uart_rx_thread.start()
 
             # Start MQTT subscriber (blocking)
-            print("Bidirectional bridge running...")
+            print("MQTT-UART Gateway running...")
             self.mqtt_subscriber.start()
         finally:
             # Cleanup
@@ -121,8 +150,8 @@ class BidirectionalBridge:
             self.mqtt_publisher.disconnect()
 
 def main():
-    bridge = BidirectionalBridge()
-    bridge.start()
+    gateway = MQTTUARTGateway()
+    gateway.start()
 
 if __name__ == "__main__":
     main()
