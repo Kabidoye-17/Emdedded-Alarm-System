@@ -14,7 +14,12 @@
  * This module handles motion detection using the ADXL343 accelerometer.
  * Hardware interrupts from the sensor are converted into RTOS events
  * that higher-level system logic can react to.
+ 
+ * Flow:
+ * ADXL343 interrupt → GPIO ISR → semaphore → MotionDetectionTask →
+ * prioritised motion event sent to system queue
  */
+
 
 /***** Activity rate limiting *****/
 /*
@@ -174,6 +179,7 @@ int adxl343_motion_start(void)
     /* ---------- Sensor configuration ---------- */
 
     // Tap detection configuration
+    // Threshold chosen to balance sensitivity vs false positives
     adxl343_write_reg(ADXL343_THRESH_TAP,   30);
     adxl343_write_reg(ADXL343_DUR,          20);
     adxl343_write_reg(ADXL343_LATENT,       40);

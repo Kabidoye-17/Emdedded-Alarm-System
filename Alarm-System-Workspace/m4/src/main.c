@@ -39,6 +39,17 @@
 #define MOSI_PIN 21
 #define MISO_PIN 22
 
+/*
+ * System startup sequence:
+ * 1. Init queues
+ * 2. Init SPI + detect ADXL343
+ * 3. Init UART
+ * 4. Init watchdog
+ * 5. Create RTOS tasks
+ * 6. Start scheduler
+ */
+
+
 int main(void) {
     init_queues();
 
