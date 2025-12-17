@@ -5,6 +5,7 @@ State machine parser for incoming UART frames with STX/ETX framing.
 Frame format: [STX][length][data...][crc_low][crc_high][ETX]
 """
 
+import serial
 from crc16 import CRC16
 from config.config import protocol as protocol_config
 
@@ -44,15 +45,17 @@ class UARTFrameParser:
         if self.state == self.STATE_WAIT_STX:
             if byte == protocol_config.stx:
                 self.state = self.STATE_READ_LENGTH
-                self.data_buffer = bytearray()
+                self.data_buffer = bytearray() # initialize buffer to store incoming data
 
         elif self.state == self.STATE_READ_LENGTH:
             self.data_length = byte
             self.data_index = 0
-            if 0 < self.data_length <= protocol_config.max_data_length:
+            # length must be greater than 0 and within max limit
+            if self.data_index < self.data_length <= protocol_config.max_data_length:
                 self.state = self.STATE_READ_DATA
             else:
                 # Invalid length
+                # Reset to wait for next frame
                 self.state = self.STATE_WAIT_STX
 
         elif self.state == self.STATE_READ_DATA:
@@ -66,7 +69,8 @@ class UARTFrameParser:
             self.state = self.STATE_READ_CRC_HIGH
 
         elif self.state == self.STATE_READ_CRC_HIGH:
-            self.received_crc |= (byte << 8)  # High byte
+            # Combine high byte with low byte: (high_byte << 8) | low_byte
+            self.received_crc |= (byte << 8) 
             self.state = self.STATE_WAIT_ETX
 
         elif self.state == self.STATE_WAIT_ETX:
@@ -90,5 +94,9 @@ class UARTFrameParser:
         if self.serial_port:
             try:
                 self.serial_port.write(bytes([protocol_config.ack]))
+            except (serial.SerialException, OSError):
+                # Port disconnected - ACK will fail silently
+                # Reconnection will be handled by RX loop
+                pass
             except Exception as e:
-                print(f"ERROR: Failed to send ACK: {e}")
+                print(f"Failed to send ACK: {e}")

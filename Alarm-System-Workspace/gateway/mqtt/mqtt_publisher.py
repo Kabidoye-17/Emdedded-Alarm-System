@@ -5,10 +5,10 @@ Publisher class for sending telemetry data to MQTT broker.
 """
 
 import json
-from mqtt_client import MQTTClient
+from mqtt.mqtt_client import MQTTClient
 
 class MQTTPublisher(MQTTClient):
-    """MQTT publisher for sending telemetry data"""
+    """MQTT publisher for sending data"""
 
     def publish(self, topic, payload):
         """
