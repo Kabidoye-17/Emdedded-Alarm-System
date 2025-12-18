@@ -93,6 +93,10 @@ void AlertControlTask(void *arg){
     init_GPIO_for_LEDs();
     // Activate start state outputs
     apply_alerts(alarm_machine.state);
+    cloud_update_event initial_update = {0};
+    initial_update.from_motion = 0;  // Not from motion sensor
+    initial_update.state = alarm_machine.state;  // DISARMED
+    send_cloud_update(&initial_update);
 
     // Create queue set for motion and command queues
     // Receives from both queues and processes whichever has data

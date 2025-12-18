@@ -97,8 +97,14 @@ class MQTTUARTGateway:
                     if self.uart.reconnect():
                         print("✓ UART reconnected successfully")
                         retry_delay = 1.0  # Reset backoff on success
-                        # Update frame parser's serial port reference
-                        self.frame_parser.serial_port = self.uart.ser
+                        # Rebuild parser to drop stale state and bind new serial handle
+                        self.frame_parser = UARTFrameParser(self.on_update_frame_received, self.uart.ser)
+                        # Flush any buffered junk from device reboot
+                        try:
+                            self.uart.ser.reset_input_buffer()
+                            self.uart.ser.reset_output_buffer()
+                        except Exception:
+                            pass
                     else:
                         # Exponential backoff (double delay up to max)
                         retry_delay = min(retry_delay * 2, max_retry_delay)

@@ -31,6 +31,12 @@ class UARTBridge:
                 self.ser.close()
 
             self.ser = serial.Serial(self.port, self.baudrate, timeout=1)
+            # Flush buffers after opening to avoid stale data
+            try:
+                self.ser.reset_input_buffer()
+                self.ser.reset_output_buffer()
+            except Exception:
+                pass
             time.sleep(0.1)
             self.connected = True
             print(f"✓ UART connected on {self.port} at {self.baudrate} baud")

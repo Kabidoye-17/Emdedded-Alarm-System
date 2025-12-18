@@ -179,6 +179,11 @@ void uart_init(uart_rxMessage_cbt uart_rxMessage_cb)
     if ((error = MXC_UART_Init(MXC_UART0, BAUD_RATE, MXC_UART_IBRO_CLK)) != E_NO_ERROR) {
         while(1);  // Halt on error
     }
+    
+    // Flush RX/TX FIFOs to clear any bootloader noise or stale data
+    MXC_UART_ClearRXFIFO(MXC_UART0);
+    MXC_UART_ClearTXFIFO(MXC_UART0);
+    
     MXC_UART_EnableInt(MXC_UART0, MXC_F_UART_INT_EN_RX_THD);
 }
 

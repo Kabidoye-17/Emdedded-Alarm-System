@@ -18,6 +18,16 @@ class MQTTPublisher(MQTTClient):
             topic: MQTT topic string
             payload: Dictionary to be JSON-encoded, or string
         """
+        # Check connection and attempt reconnect if needed
+        if not self.client.is_connected():
+            print("MQTT publisher disconnected, attempting reconnect...")
+            try:
+                self.client.reconnect()
+                print("✓ MQTT publisher reconnected")
+            except Exception as e:
+                print(f"✗ MQTT reconnect failed: {e}")
+                return False
+
         if isinstance(payload, dict):
             message = json.dumps(payload)
         else:
@@ -27,5 +37,7 @@ class MQTTPublisher(MQTTClient):
 
         if result.rc == 0:
             print(f"Published to {topic}: {message}")
+            return True
         else:
-            print(f"ERROR: Failed to publish to {topic}")
+            print(f"ERROR: Failed to publish to {topic}. Return code: {result.rc}")
+            return False
