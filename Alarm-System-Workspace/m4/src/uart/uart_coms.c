@@ -170,7 +170,7 @@ void uart_init(uart_rxMessage_cbt uart_rxMessage_cb)
     uart_vars.uart_rxMessage_cb = uart_rxMessage_cb;
     uart_vars.state = STATE_WAIT_STX;
 
-    NVIC_DisableIRQ(UART0_IRQn);
+    NVIC_DisableIRQ(UART0_IRQn); 
     NVIC_ClearPendingIRQ(UART0_IRQn);
     MXC_NVIC_SetVector(UART0_IRQn, UART0_Handler);
     NVIC_EnableIRQ(UART0_IRQn);
@@ -184,6 +184,9 @@ void uart_init(uart_rxMessage_cbt uart_rxMessage_cb)
     MXC_UART_ClearRXFIFO(MXC_UART0);
     MXC_UART_ClearTXFIFO(MXC_UART0);
     
+    // Set RX threshold to 1 byte to trigger interrupt on each received byte
+    MXC_UART_SetRXThreshold(MXC_UART0, 1);
+
     MXC_UART_EnableInt(MXC_UART0, MXC_F_UART_INT_EN_RX_THD);
 }
 
