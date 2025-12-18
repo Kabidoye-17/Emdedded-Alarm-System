@@ -34,7 +34,4 @@ void alarm_sm_handle_event(alarm_sm *sm, alarm_event event);
 // Get current state of the state machine
 alarm_state alarm_sm_state(const alarm_sm *sm);
 
-/// Get string name of the given state
-const char *alarm_state_name(alarm_state state);
-
 #endif /* STATE_MACHINE_H */
