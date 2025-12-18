@@ -135,15 +135,28 @@ int adxl343_write_reg(uint8_t reg, uint8_t value)
 
 int adxl343_read_regs(uint8_t start_reg, uint8_t *values, uint32_t len)
 {
+    // 1 command byte + requested data bytes
     uint32_t total = len + 1;
-    if (total > ADXL343_SPI_MAX_TRANSFER) return E_BAD_PARAM;
 
+    // Prevent oversized SPI transfers
+    if (total > ADXL343_SPI_MAX_TRANSFER)
+        return E_BAD_PARAM;
+
+    // SPI transmit and receive buffers
     uint8_t tx[ADXL343_SPI_MAX_TRANSFER] = {0};
     uint8_t rx[ADXL343_SPI_MAX_TRANSFER] = {0};
-    tx[0] = start_reg | ADXL343_SPI_READ | ((len > 1) ? ADXL343_SPI_MB : 0);
 
+    // Build read command (address + read bit + optional multi-byte bit)
+    tx[0] = start_reg | ADXL343_SPI_READ |
+            ((len > 1) ? ADXL343_SPI_MB : 0);
+
+    // Perform blocking SPI transaction
     int ret = adxl343_spi_xfer(tx, rx, total);
-    if (ret == E_NO_ERROR) memcpy(values, &rx[1], len);
+
+    // Copy received register data (skip command byte)
+    if (ret == E_NO_ERROR)
+        memcpy(values, &rx[1], len);
+
     return ret;
 }
 
@@ -209,27 +222,4 @@ int adxl343_init(void)
                              ADXL343_POWER_MEASURE);
 }
 
-
-/***** Read X, Y, Z acceleration *****/
-/*
- * Reads raw acceleration data from the ADXL343.
- * Output values are signed 16-bit integers.
- *
- * Note: This function is no longer required for motion detection,
- * but is kept for debugging and reference.
- */
-int adxl343_read_xyz(int16_t *x, int16_t *y, int16_t *z)
-{
-    uint8_t raw[6] = {0};
-
-    // Read 6 bytes starting from DATAX0
-    int ret = adxl343_read_regs(ADXL343_REG_DATAX0, raw, 6);
-    if (ret != E_NO_ERROR) return ret;
-
-    // Combine low and high bytes for each axis
-    *x = (int16_t)((raw[1] << 8) | raw[0]);
-    *y = (int16_t)((raw[3] << 8) | raw[2]);
-    *z = (int16_t)((raw[5] << 8) | raw[4]);
-    return E_NO_ERROR;
-}
 

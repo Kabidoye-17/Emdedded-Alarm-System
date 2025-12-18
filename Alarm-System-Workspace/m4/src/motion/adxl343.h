@@ -31,7 +31,6 @@
 int adxl343_spi_init(const mxc_spi_pins_t *pins);
 int adxl343_probe(void);
 int adxl343_init(void);
-int adxl343_read_xyz(int16_t *x, int16_t *y, int16_t *z);
 void adxl343_set_ss(int ss);
 
 int adxl343_write_reg(uint8_t reg, uint8_t value);

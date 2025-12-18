@@ -61,7 +61,6 @@ static TickType_t last_activity_tick = 0;
  */
 #define ADXL343_INT_DOUBLE_TAP (1 << 5)
 #define ADXL343_INT_ACTIVITY   (1 << 4)
-#define ADXL343_INT_INACTIVITY (1 << 3)
 #define ADXL343_INT_FREE_FALL  (1 << 2)
 
 
@@ -77,7 +76,6 @@ static TickType_t last_activity_tick = 0;
 /* ---------- RTOS objects ---------- */
 /*
  * motionSem   -> binary semaphore used to wake the motion task from ISR
- * motionQueue -> queue used to send motion warning events to the system
  */
 static SemaphoreHandle_t motionSem;
 
@@ -204,7 +202,6 @@ int adxl343_motion_start(void)
         ADXL343_INT_ENABLE,
         ADXL343_INT_DOUBLE_TAP |
         ADXL343_INT_ACTIVITY   |
-        ADXL343_INT_INACTIVITY |
         ADXL343_INT_FREE_FALL
     );
 
