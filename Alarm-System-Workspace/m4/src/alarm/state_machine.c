@@ -67,21 +67,3 @@ alarm_state alarm_sm_state(const alarm_sm *sm) {
 
 	return sm->state;
 }
-
-// Get string name of the given state
-const char *alarm_state_name(alarm_state state) {
-	switch (state) {
-	case DISARMED:
-		return "DISARMED";
-	case ARMED_IDLE:
-		return "ARMED_IDLE";
-	case WARN:
-		return "WARN";
-	case ALERT:
-		return "ALERT";
-	case ALARM:
-		return "ALARM";
-	default:
-		return "UNKNOWN";
-	}
-}

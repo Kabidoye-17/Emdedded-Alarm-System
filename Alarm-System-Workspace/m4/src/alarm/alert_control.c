@@ -74,7 +74,7 @@ int send_cloud_update(cloud_update_event* update) {
         cloud_update_event discarded;
         xQueueReceive(cloud_update_queue, &discarded, 0);
 
-        // Retry sending new update (should succeed now)
+        // Retry sending new update (succeeds now)
         xQueueSend(cloud_update_queue, update, 0);
     }
     return pdPASS;

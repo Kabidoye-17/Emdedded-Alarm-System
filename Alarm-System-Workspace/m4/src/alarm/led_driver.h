@@ -7,11 +7,11 @@
  * Always at least one alert should be active based on the current state.
  * 
  * The alert priorities are as follows (highest to lowest):
- * 1. ALARM_STATE_ALARM: Red LED flashing + siren on
+ * 1. ALARM_STATE_ALARM: Red LED flashing
  * 2. ALARM_STATE_ALERT: Red LED breathing
  * 3. ALARM_STATE_WARN: Solid red LED
- * 4. ALARM_STATE_ARMED_IDLE: Solid blue LED
- * 5. ALARM_STATE_DISARMED: Solid green LED
+ * 4. ALARM_STATE_ARMED_IDLE: Solid green LED
+ * 5. ALARM_STATE_DISARMED: Solid blue LED
  * 
  * No two alerts can be active at the same time (state machine).
  * Higher priority alerts override lower priority ones.
