@@ -54,7 +54,7 @@
 */
 
 void create_LED_control_task(void) {
-    xTaskCreate(LedEffectTask, "LEDEffects", 512, NULL, 1,NULL);
+    xTaskCreate(LedEffectTask, "LEDEffects", 512, NULL, tskIDLE_PRIORITY + 1,NULL);
 }
 
 void create_alert_control_task(void) {
