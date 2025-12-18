@@ -3,12 +3,16 @@
 
 #include <stdint.h>
 
-//=========================== define ==========================================
 
+// CRC-16 initial value - start all CRC calculations with this value
 #define CRCINIT         0xffff
+
+// Expected CRC result when validating received data (not used in this implementation)
 #define CRCGOOD         0xf0b8
 
-// this table is used to expedite execution (at the expense of memory usage)
+// Precomputed CRC-16 lookup table (256 entries × 2 bytes = 512 bytes)
+// Trades 512 bytes of flash memory for ~8x faster CRC calculation
+// Each entry represents the CRC contribution for a specific byte value
 static const uint16_t crc_fcstab[256] = {
    0x0000, 0x1189, 0x2312, 0x329b, 0x4624, 0x57ad, 0x6536, 0x74bf,
    0x8c48, 0x9dc1, 0xaf5a, 0xbed3, 0xca6c, 0xdbe5, 0xe97e, 0xf8f7,
@@ -44,9 +48,6 @@ static const uint16_t crc_fcstab[256] = {
    0x7bc7, 0x6a4e, 0x58d5, 0x495c, 0x3de3, 0x2c6a, 0x1ef1, 0x0f78
 };
 
-//=========================== typedef =========================================
-
-//=========================== prototypes ======================================
 
 uint16_t crc_iterate(uint16_t crc, uint8_t byte);
 

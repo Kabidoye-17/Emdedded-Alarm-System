@@ -25,7 +25,7 @@ class MQTTUARTGateway:
         # MQTT subscriber for commands (existing)
         self.mqtt_subscriber = MQTTSubscriber()
 
-        # MQTT publisher for telemetry (new)
+        # MQTT publisher for update (new)
         self.mqtt_publisher = MQTTPublisher()
 
         # Frame parser for incoming UART data (pass serial port for ACK)

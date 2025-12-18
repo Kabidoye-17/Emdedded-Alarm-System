@@ -87,62 +87,94 @@ void UART0_Handler(void)
 
         switch (uart_vars.state) {
             case STATE_WAIT_STX:
+                // Idle state - waiting for frame start marker or standalone ACK
                 if (byte == PROTOCOL_STX) {
+                    // Start of frame detected - prepare to receive new message
                     uart_vars.state = STATE_READ_LENGTH;
+
+                    // Initialize CRC calculation (all frames include length and data in CRC)
                     uart_vars.calculated_crc = CRCINIT;
+
+                    // Clear data buffer to ensure clean state for new frame
                     memset(uart_vars.data_buffer, 0, MAX_DATA_LENGTH);
+
                 } else if (byte == ACK_BYTE) {
-                    // ACK byte received from gateway - signal cloud_send_task
+                    // Standalone ACK byte (0xAA) received from gateway
+                    // This acknowledges a frame we previously sent
+                    // Signal the cloud_send_task via semaphore to unblock waiting
                     on_ack_received();
                 }
-                // Otherwise ignore byte and stay in WAIT_STX
+                // Any other byte: noise or out-of-sync data - ignore and stay in WAIT_STX
                 break;
 
             case STATE_READ_LENGTH:
+                // Read the length byte which tells us how many data bytes to expect
                 uart_vars.data_length = byte;
-                uart_vars.data_index = 0;
+                uart_vars.data_index = 0;  // Reset buffer index for incoming data
+
+                // Length byte is included in CRC calculation
                 uart_vars.calculated_crc = crc_iterate(uart_vars.calculated_crc, byte);
 
+                // Validate length is within acceptable range (1-16 bytes)
                 if (uart_vars.data_length > 0 && uart_vars.data_length <= MAX_DATA_LENGTH) {
+                    // Valid length - proceed to read data bytes
                     uart_vars.state = STATE_READ_DATA;
                 } else {
-                    // Invalid length, reset state machine
+                    // Invalid length (0 or >16) - malformed frame
+                    // Abort and return to idle state to resynchronize
                     uart_vars.state = STATE_WAIT_STX;
                 }
                 break;
 
             case STATE_READ_DATA:
+                // Accumulate data bytes into buffer while updating CRC
+                // Store the byte in the buffer at the current index (then increment index)
                 uart_vars.data_buffer[uart_vars.data_index++] = byte;
+
+                // Update running CRC calculation with this data byte
                 uart_vars.calculated_crc = crc_iterate(uart_vars.calculated_crc, byte);
 
+                // Check if we've received all expected data bytes
                 if (uart_vars.data_index >= uart_vars.data_length) {
+                    // All data received - next bytes will be CRC (low byte first)
                     uart_vars.state = STATE_READ_CRC_LOW;
                 }
                 break;
 
             case STATE_READ_CRC_LOW:
-                uart_vars.received_crc = byte;  // Low byte
+                // Read the low byte (LSB) of the 16-bit CRC sent by transmitter
+                // CRC is transmitted little-endian: low byte first, high byte second
+                uart_vars.received_crc = byte;  // Store low 8 bits
                 uart_vars.state = STATE_READ_CRC_HIGH;
                 break;
 
             case STATE_READ_CRC_HIGH:
-                uart_vars.received_crc |= (byte << 8);  // High byte
+                // Read the high byte (MSB) of the 16-bit CRC
+                // Combine with low byte to form complete 16-bit CRC value
+                uart_vars.received_crc |= (byte << 8);  // Shift high byte left, OR with low byte
                 uart_vars.state = STATE_WAIT_ETX;
                 break;
 
             case STATE_WAIT_ETX:
+                // Expecting ETX frame terminator - validate and process if present
                 if (byte == PROTOCOL_ETX) {
-                    // Validate CRC
+                    // Valid frame terminator received - now validate CRC checksum
                     if (uart_vars.calculated_crc == uart_vars.received_crc) {
-                        // Parse command and invoke callback
+                        // CRC matches - frame is valid, parse the command
                         command_type cmd = parse_command(uart_vars.data_buffer, uart_vars.data_length);
+
+                        // Invoke callback if command is recognized and callback is registered
                         if (cmd != UNKNOWN_COMMAND && uart_vars.uart_rxMessage_cb != NULL) {
                             uart_vars.uart_rxMessage_cb(cmd);
                         }
                     }
-                    // Silently discard on CRC error (as per spec)
+                    // If CRC mismatch: silently discard frame (as per spec)
+                    // This prevents acting on corrupted data
                 }
-                // Always reset to wait for next frame
+                // If byte != ETX: frame is malformed, discard
+
+                // Always reset state machine to wait for next frame
+                // Even on error, we return to idle state to resynchronize
                 uart_vars.state = STATE_WAIT_STX;
                 break;
         }
