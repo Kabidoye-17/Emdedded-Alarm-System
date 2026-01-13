@@ -227,7 +227,7 @@ void uart_init(uart_rxMessage_cbt uart_rxMessage_cb)
  *
  * @param byte Byte to transmit
  * @param timeout_ms Timeout in milliseconds
- * @return 0 on success, -1 on timeout (gateway offline)
+ * @return 0 on success, -1 on timeout 
  */
 static int uart_txByte_with_timeout(uint8_t byte, uint32_t timeout_ms) {
     TickType_t start_tick = xTaskGetTickCount();
@@ -236,7 +236,7 @@ static int uart_txByte_with_timeout(uint8_t byte, uint32_t timeout_ms) {
     while (MXC_UART_GetTXFIFOAvailable(MXC_UART0) == 0) {
         // Check if timeout exceeded
         if ((xTaskGetTickCount() - start_tick) >= timeout_ticks) {
-            return -1;  // Timeout - assume gateway offline
+            return -1;  // Timeout 
         }
 
         // Yield CPU to prevent busy-wait

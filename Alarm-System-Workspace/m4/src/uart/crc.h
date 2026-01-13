@@ -7,9 +7,6 @@
 // CRC-16 initial value - start all CRC calculations with this value
 #define CRCINIT         0xffff
 
-// Expected CRC result when validating received data (not used in this implementation)
-#define CRCGOOD         0xf0b8
-
 // Precomputed CRC-16 lookup table (256 entries × 2 bytes = 512 bytes)
 // Trades 512 bytes of flash memory for ~8x faster CRC calculation
 // Each entry represents the CRC contribution for a specific byte value
