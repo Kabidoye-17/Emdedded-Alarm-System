@@ -6,7 +6,7 @@ An embedded C project that simulates an alarmed casing for a jewel in a museum. 
 
 - **MAX32655 Board** (Analog Devices)
 - **ISE Development Board** (Analog Devices)
-![ISE Board](content/SEBoard.png)
+![ISE Board](content/ISEBoard.png)
 
 
 ## System Components
